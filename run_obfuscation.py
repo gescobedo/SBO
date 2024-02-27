@@ -31,7 +31,7 @@ for data_dir in datasets_source:
                 "topk":50,
                 "obf_method":"remove",
                 "sample_method":"ff",
-                "stereo_type":"median",
+                "stereo_type":"mean",
                 "user_stereo_pref_thresh":0.005,
             }
             )

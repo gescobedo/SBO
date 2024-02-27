@@ -65,17 +65,22 @@ def transform_to_recbole(data):
         'userID':      'user_id:token',
         'itemID':     'item_id:token',
         'gender':    'gender:token',
-        #'timestamp':    'timestamp:float',
+        'timestamp':    'timestamp:float',
+        'rating' : 'rating:token',
+        'tr':    'tr:token',
         }
     data.rename(columns=recbole_map,inplace=True )
     return data
 
 def transform_to_obf(data):
     recbole_map = {
-        'user_id:token': 'userID',
-        'item_id:token':'itemID'     ,
-        'gender:token':'gender',
-        #'timestamp':    'timestamp:float',
+        'user_id:token' : 'userID',
+        'item_id:token' : 'itemID'     ,
+        'gender:token' : 'gender',
+        'timestamp:float' : 'timestamp',
+        'rating:token' : 'rating',
+        'tr:token': 'tr',
+
         }
     data.rename(columns=recbole_map,inplace=True )
     return data

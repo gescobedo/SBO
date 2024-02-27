@@ -11,12 +11,29 @@ import torch
 from joblib import delayed, Parallel
 from recbole.utils import list_to_latex
 from pathlib import Path
-months=[7,8,9,10,11]
-config_base = {}
-obfuscation_methods  = ["cabns-cluster","outer_diff_neg", "avg_pos-neg", "avg_pos-cluster"]
 
-datasets = []
-models = ["BPR","LightGCN","MultVAE"]
+config_base = {}
+datasets  = [
+        'ml-1m',
+        'ml-1m_remove_0.05_ff_median_th0.005', 
+        'ml-1m_remove_0.1_ff_median_th0.005', 
+        #'ml-1m_remove_0.15_ff_median_th0.005',
+        'lfm-100k'
+        'lfm-100k_remove_0.05_ff_median_th0.005', 
+        'lfm-100k_remove_0.1_ff_median_th0.005', 
+        #'lfm-100k_remove_0.15_ff_median_th0.005',
+        'ml-1m_remove_0.05_ff_mean_th0.005', 
+        'ml-1m_remove_0.1_ff_mean_th0.005', 
+        #'ml-1m_remove_0.15_ff_mean_th0.005', 
+        'lfm-100k_remove_0.05_ff_mean_th0.005', 
+        'lfm-100k_remove_0.1_ff_mean_th0.005', 
+        #'lfm-100k_remove_0.15_ff_mean_th0.005'      
+]
+
+models = ["BPR",
+          #"LightGCN",
+          #"MultVAE"
+          ]
 num_cores= 6
 
 parameter_dict = {
@@ -27,7 +44,7 @@ parameter_dict = {
     "save_dataset": True,
     "save_dataloaders": True,
     "embedding_size": 64,
-    "epochs": 1, 
+    "epochs": 100, 
     "train_batch_size": 512,
     "eval_batch_size": 2048, 
     "benchmark_filename": ['train','valid','test'] ,
@@ -36,11 +53,11 @@ parameter_dict = {
     "topk": [10,20,50],
     "metric_decimal_place":6,
     "valid_metric": "NDCG@10",
-    'train_neg_sample_args': {
-        'distribution':"user_custom",
-        'user_pool': "",
-        'mode_sampler': "true_negatives_shrink"
-    },
+    #'train_neg_sample_args': {
+    #    'distribution':"user_custom",
+    #    'user_pool': "",
+    #    'mode_sampler': "true_negatives_shrink"
+    #},
     #"use_gpu":False,
     #"device": torch.device('cpu')
     "nproc":4,
@@ -51,9 +68,9 @@ def run_alg(args, model, dataset, config):
 
 
     data_path = config["out_dir"]
-    config["checkpoint_dir"] = data_path + "saved/"+config["train_neg_sample_args"]["user_pool"]+"/"
-    config["dataset_save_path"]= data_path + "saved/"+config["train_neg_sample_args"]["user_pool"]+f"/{model}_dataset.pth"
-    config["dataloaders_save_path"]= data_path + "saved/"+config["train_neg_sample_args"]["user_pool"]+f"/{model}_dataloader.pth"
+    config["checkpoint_dir"] = data_path + "saved/"+dataset+"/"
+    config["dataset_save_path"]= data_path + "saved/"+dataset+f"/{model}_dataset.pth"
+    config["dataloaders_save_path"]= data_path + "saved/"+dataset+f"/{model}_dataloader.pth"
 
     config["world_size"]= args.world_size
     config["ip"]= args.ip
@@ -79,8 +96,8 @@ def run_alg(args, model, dataset, config):
     #)
    
     results = run_recbole(model=model,dataset=dataset,config_dict=config)
-    results['name'] = f"{model}-{dataset}-{config['train_neg_sample_args']['user_pool']}"
-    results['user_pool'] = config["train_neg_sample_args"]["user_pool"]
+    results['name'] = f"{model}-{dataset}"
+    
     return results
     
 
@@ -144,7 +161,7 @@ if __name__ == "__main__":
     test_result_list = []
     for dataset in datasets:
         
-        results_list = Parallel(n_jobs=len(obfuscation_methods))(delayed(run_alg)(*param) for param in params[dataset])
+        results_list = Parallel(n_jobs=len(datasets))(delayed(run_alg)(*param) for param in params[dataset])
         for res_dict in results_list:
             valid_res_dict = {"Model": model}
             test_res_dict = {"Model": model}
@@ -154,8 +171,8 @@ if __name__ == "__main__":
             test_res_dict["test_result"]=result["test_result"]
             test_res_dict["name"]=result["name"]
             
-            valid_res_dict["user_pool"]=result["user_pool"]
-            test_res_dict["user_pool"]=result["user_pool"]
+            #valid_res_dict["user_pool"]=result["user_pool"]
+            #test_res_dict["user_pool"]=result["user_pool"]
             
             bigger_flag = result["valid_score_bigger"]
             subset_columns = list(result["best_valid_result"].keys())
