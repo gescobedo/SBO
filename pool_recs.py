@@ -6,7 +6,7 @@ import pickle
 import os
 import argparse
 from tqdm import tqdm
-from recbole.quick_start import run_recbole, run_recboles, run_recbole_conf
+from recbole.quick_start import run_recbole, run_recboles# run_recbole_conf
 import torch
 from joblib import delayed, Parallel
 from recbole.utils import list_to_latex
@@ -15,12 +15,12 @@ from pathlib import Path
 config_base = {}
 datasets  = [
         'ml-1m',
-        'ml-1m_remove_0.05_ff_median_th0.005', 
-        'ml-1m_remove_0.1_ff_median_th0.005', 
+        #'ml-1m_remove_0.05_ff_median_th0.005', 
+        #'ml-1m_remove_0.1_ff_median_th0.005', 
         #'ml-1m_remove_0.15_ff_median_th0.005',
         'lfm-100k'
-        'lfm-100k_remove_0.05_ff_median_th0.005', 
-        'lfm-100k_remove_0.1_ff_median_th0.005', 
+        #'lfm-100k_remove_0.05_ff_median_th0.005', 
+        #'lfm-100k_remove_0.1_ff_median_th0.005', 
         #'lfm-100k_remove_0.15_ff_median_th0.005',
         'ml-1m_remove_0.05_ff_mean_th0.005', 
         'ml-1m_remove_0.1_ff_mean_th0.005', 
@@ -60,7 +60,7 @@ parameter_dict = {
     #},
     #"use_gpu":False,
     #"device": torch.device('cpu')
-    "nproc":4,
+    "nproc":1,
     "gpu_id": '1,2,3',     
 }
 def run_alg(args, model, dataset, config):
