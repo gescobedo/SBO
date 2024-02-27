@@ -58,9 +58,9 @@ parameter_dict = {
     #    'user_pool': "",
     #    'mode_sampler': "true_negatives_shrink"
     #},
-    #"use_gpu":False,
+    "use_gpu":True,
     #"device": torch.device('cpu')
-    "nproc":1,
+    "nproc":8,
     "gpu_id": '1,2,3',     
 }
 def run_alg(args, model, dataset, config):
