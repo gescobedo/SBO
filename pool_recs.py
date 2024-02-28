@@ -14,25 +14,20 @@ from pathlib import Path
 
 config_base = {}
 datasets  = [
-        'ml-1m',
-        #'ml-1m_remove_0.05_ff_median_th0.005', 
-        #'ml-1m_remove_0.1_ff_median_th0.005', 
-        #'ml-1m_remove_0.15_ff_median_th0.005',
-        'lfm-100k'
-        #'lfm-100k_remove_0.05_ff_median_th0.005', 
-        #'lfm-100k_remove_0.1_ff_median_th0.005', 
-        #'lfm-100k_remove_0.15_ff_median_th0.005',
-        'ml-1m_remove_0.05_ff_mean_th0.005', 
-        'ml-1m_remove_0.1_ff_mean_th0.005', 
-        #'ml-1m_remove_0.15_ff_mean_th0.005', 
-        'lfm-100k_remove_0.05_ff_mean_th0.005', 
-        'lfm-100k_remove_0.1_ff_mean_th0.005', 
-        #'lfm-100k_remove_0.15_ff_mean_th0.005'      
+        '',
+        #'_remove_0.05_ff_median_th0.005', 
+        #'_remove_0.1_ff_median_th0.005', 
+        #'_remove_0.15_ff_median_th0.005',
+        '_remove_0.05_ff_mean_th0.005', 
+        '_remove_0.1_ff_mean_th0.005', 
+        #'_remove_0.15_ff_mean_th0.005', 
 ]
+        
+        
 
 models = ["BPR",
-          #"LightGCN",
-          #"MultVAE"
+          "LightGCN",
+          "MultiVAE"
           ]
 num_cores= 6
 
@@ -60,8 +55,8 @@ parameter_dict = {
     #},
     "use_gpu":True,
     #"device": torch.device('cpu')
-    "nproc":8,
-    "gpu_id": '1,2,3',     
+    #"nproc":8,
+    #"gpu_id": '1,2,3',     
 }
 def run_alg(args, model, dataset, config):
     #model, dataset, config =args
@@ -110,6 +105,8 @@ if __name__ == "__main__":
     parser.add_argument('--model', required=True,help='path to Test file')
     parser.add_argument('--data_path', required=True,help='path to Test file')
     parser.add_argument('--out_dir',required=False)
+    parser.add_argument('--gpu',type=int,required=False)
+
     parser.add_argument("--valid_latex", type=str, default="./latex/valid.tex", help="config files"
     )
     parser.add_argument(
@@ -136,48 +133,50 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     model = args.model
+    models = args.model.split(",")
     parameter_dict["data_path"] = args.data_path
     parameter_dict["out_dir"] = args.out_dir
     if  not os.path.exists(args.out_dir):
         os.makedirs(args.out_dir)
-    params = {}
-    gpu_ids = [3]*20
+    params = []
+    gpu_ids = [1,2,3]*20
     gpu_id = 0
     
 
-
-    for dataset in datasets:
-        params[dataset]=[]
-        config = parameter_dict.copy()
-        
-        config["gpu_id"] =gpu_ids[gpu_id]
-        gpu_id+=1    
-        params[dataset].append((args,model,dataset,config))
+    for model in models:
+        for dataset in datasets:
+            
+            config = parameter_dict.copy()
+            config["gpu_id"] = args.gpu
+            #config["device"] = torch.device(f'cuda:{gpu_ids[gpu_id]}')
+            gpu_id+=1    
+            params.append((args,model,dataset,config))
     
     from recbole.quick_start import run_recboles
     import torch.multiprocessing as mp
     results_months = {}
     valid_result_list = []
     test_result_list = []
-    for dataset in datasets:
+    #for dataset in datasets:
+    results_list = []
+    #print(params)    
+    results_list = Parallel(n_jobs=args.nproc)(delayed(run_alg)(*param) for param in params)
+    for res_dict in results_list:
+        valid_res_dict = {"Model": model}
+        test_res_dict = {"Model": model}
+        result = res_dict.copy()
+        valid_res_dict["best_valid_result"]=result["best_valid_result"]
+        valid_res_dict["name"]=result["name"]
+        test_res_dict["test_result"]=result["test_result"]
+        test_res_dict["name"]=result["name"]
         
-        results_list = Parallel(n_jobs=len(datasets))(delayed(run_alg)(*param) for param in params[dataset])
-        for res_dict in results_list:
-            valid_res_dict = {"Model": model}
-            test_res_dict = {"Model": model}
-            result = res_dict.copy()
-            valid_res_dict["best_valid_result"]=result["best_valid_result"]
-            valid_res_dict["name"]=result["name"]
-            test_res_dict["test_result"]=result["test_result"]
-            test_res_dict["name"]=result["name"]
-            
-            #valid_res_dict["user_pool"]=result["user_pool"]
-            #test_res_dict["user_pool"]=result["user_pool"]
-            
-            bigger_flag = result["valid_score_bigger"]
-            subset_columns = list(result["best_valid_result"].keys())
-            valid_result_list.append(valid_res_dict)
-            test_result_list.append(test_res_dict)
+        #valid_res_dict["user_pool"]=result["user_pool"]
+        #test_res_dict["user_pool"]=result["user_pool"]
+        
+        bigger_flag = result["valid_score_bigger"]
+        subset_columns = list(result["best_valid_result"].keys())
+        valid_result_list.append(valid_res_dict)
+        test_result_list.append(test_res_dict)
 
     #valid_result_list = []
     #test_result_list = []
@@ -201,6 +200,6 @@ if __name__ == "__main__":
     #    test_result_list.append(test_res_dict)
     print(f"Saving results to {args.out_dir}")
 
-    pickle.dump(valid_result_list,open(Path(args.out_dir)/f"valid_{args.model}_{str(datetime.now())}.pkl","wb"))    
-    pickle.dump(test_result_list,open(Path(args.out_dir)/f"test_{args.model}_{str(datetime.now())}.pkl","wb"))    
+    pickle.dump(valid_result_list,open(Path(args.out_dir)// f"valid_{args.model}_{str(datetime.now())}.pkl","wb"))    
+    pickle.dump(test_result_list,open(Path(args.out_dir)//f"test_{args.model}_{str(datetime.now())}.pkl","wb"))    
     
