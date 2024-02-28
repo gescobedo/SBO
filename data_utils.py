@@ -67,6 +67,7 @@ def transform_to_recbole(data):
         'gender':    'gender:token',
         'timestamp':    'timestamp:float',
         'rating' : 'rating:token',
+        'freq' : 'freq:float',
         'tr':    'tr:token',
         }
     data.rename(columns=recbole_map,inplace=True )
@@ -79,6 +80,7 @@ def transform_to_obf(data):
         'gender:token' : 'gender',
         'timestamp:float' : 'timestamp',
         'rating:token' : 'rating',
+        'freq:float' : 'freq',
         'tr:token': 'tr',
 
         }
