@@ -106,6 +106,7 @@ if __name__ == "__main__":
     parser.add_argument('--data_path', required=True,help='path to Test file')
     parser.add_argument('--out_dir',required=False)
     parser.add_argument('--gpu',type=int,required=False)
+    parser.add_argument('--dataset',type=int,required=False)
 
     parser.add_argument("--valid_latex", type=str, default="./latex/valid.tex", help="config files"
     )
@@ -134,6 +135,8 @@ if __name__ == "__main__":
 
     model = args.model
     models = args.model.split(",")
+    dataset_name = args.dataset
+    datasets =[f"{dataset_name}{folder}" for forlder in datasets]
     parameter_dict["data_path"] = args.data_path
     parameter_dict["out_dir"] = args.out_dir
     if  not os.path.exists(args.out_dir):
@@ -200,6 +203,9 @@ if __name__ == "__main__":
     #    test_result_list.append(test_res_dict)
     print(f"Saving results to {args.out_dir}")
 
-    pickle.dump(valid_result_list,open(Path(args.out_dir)// f"valid_{args.model}_{str(datetime.now())}.pkl","wb"))    
-    pickle.dump(test_result_list,open(Path(args.out_dir)//f"test_{args.model}_{str(datetime.now())}.pkl","wb"))    
+    if  not os.path.exists("/".join([args.out_dir,dataset_name])):
+        os.makedirs("/".join([args.out_dir,dataset_name]))
+    
+    pickle.dump(valid_result_list,open(Path(args.out_dir)/dataset_name/ f"valid_{args.model}_{str(datetime.now())}.pkl","wb"))    
+    pickle.dump(test_result_list,open(Path(args.out_dir)/dataset_name/f"test_{args.model}_{str(datetime.now())}.pkl","wb"))    
     

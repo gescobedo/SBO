@@ -26,6 +26,7 @@ results_files= [
 'right-10000/test_NeuMF_2023-09-14 13:58:58.566903.pkl'
 ]
 #%%
+
 import pickle
 def convert_table(file):
     for res in file:
