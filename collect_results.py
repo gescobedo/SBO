@@ -1,4 +1,6 @@
+#%%
 import pandas as pd
+
 
 
 results_files = ['random_completion-1000/test_BPR_2023-08-30 16:25:46.145796.pkl',
@@ -18,14 +20,19 @@ results_files = [
 ]
 results_files= [
 
-'right-10000/test_BPR_2023-09-13 12:30:08.207331.pkl', 
-'right-10000/test_LightGCN_2023-09-14 02:28:45.780509.pkl',
-'right-10000/test_NeuMF_2023-09-13 16:55:05.256836.pkl',
-'right-10000/test_BPR_2023-09-14 12:04:32.508211.pkl', 
-'right-10000/test_LightGCN_2023-09-14 19:54:03.404005.pkl',
-'right-10000/test_NeuMF_2023-09-14 13:58:58.566903.pkl'
+
+'/home/gustavoe/obfuscation/ml_small/ml-1m-1000/test_BPR_2024-02-29 11:12:03.117474.pkl',
+'/home/gustavoe/obfuscation/lfm_small/lfm-100k-1000/test_BPR_2024-02-29 11:14:42.795227.pkl' ,      
+
+'/home/gustavoe/obfuscation/ml_small/ml-1m-1000/test_LightGCN_2024-02-29 11:23:20.712729.pkl',
+'/home/gustavoe/obfuscation/lfm_small/lfm-100k-1000/test_LightGCN_2024-02-29 11:26:44.819582.pkl',  
+
+'/home/gustavoe/obfuscation/ml_small/ml-1m-1000/test_MultiVAE_2024-02-29 11:24:28.270790.pkl',
+'/home/gustavoe/obfuscation/lfm_small/lfm-100k-1000/test_MultiVAE_2024-02-29 11:22:40.385898.pkl',
 ]
 #%%
+DEFAULT_RESULTS_DIR = "/home/gustavoe/obfuscation"
+#results_files = [f"{DEFAULT_RESULTS_DIR}/{file}" for file in results_files]
 
 import pickle
 def convert_table(file):
@@ -33,9 +40,11 @@ def convert_table(file):
         res.update(res["test_result"])
    
     df = pd.DataFrame.from_dict(file)
-    #print(df)
-    converted_df=df.groupby(["Model","dataset"])[[x for x in df.columns if  x.endswith("10")]].mean()
-    std_df=df.groupby(["Model","dataset"])[[x for x in df.columns if  x.endswith("10")]].std()
+    print(df.columns)
+    print(df.head())
+    df["dataset"]=df["name"].apply(lambda x : "-".join(x.split("-")[1:]))
+    converted_df=df.groupby(["Model","dataset"])[[x for x in df.columns if  x.endswith("20")]].mean()
+    std_df=df.groupby(["Model","dataset"])[[x for x in df.columns if  x.endswith("20")]].std()
     return df,converted_df,std_df
 
 from collections import defaultdict
@@ -53,8 +62,11 @@ for key,data in results_dict.items():
     processed_results_dict[key]=conv_df
     print(key)
     print(processed_results_dict[key])
-    print(std)
+    #print(std)
     dfs.append(df)
-pd.concat(dfs,axis=0,ignore_index=True).to_csv("result_table-right.csv",index=False)
+joined= pd.concat(dfs,axis=0,ignore_index=True)
+print(joined.head())
+#%%
+joined.to_csv("result_table-right.csv",index=False)
 
 

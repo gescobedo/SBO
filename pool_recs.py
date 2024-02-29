@@ -14,12 +14,13 @@ from pathlib import Path
 
 config_base = {}
 datasets  = [
-        '',
+        #'',
         #'_remove_0.05_ff_median_th0.005', 
         #'_remove_0.1_ff_median_th0.005', 
         #'_remove_0.15_ff_median_th0.005',
+        
         '_remove_0.05_ff_mean_th0.005', 
-        '_remove_0.1_ff_mean_th0.005', 
+        #'_remove_0.1_ff_mean_th0.005', 
         #'_remove_0.15_ff_mean_th0.005', 
 ]
         
@@ -56,7 +57,8 @@ parameter_dict = {
     "use_gpu":True,
     #"device": torch.device('cpu')
     #"nproc":8,
-    #"gpu_id": '1,2,3',     
+    #"gpu_id": '1,2,3',
+    "log_wandb": True     
 }
 def run_alg(args, model, dataset, config):
     #model, dataset, config =args
@@ -106,7 +108,7 @@ if __name__ == "__main__":
     parser.add_argument('--data_path', required=True,help='path to Test file')
     parser.add_argument('--out_dir',required=False)
     parser.add_argument('--gpu',type=int,required=False)
-    parser.add_argument('--dataset',type=int,required=False)
+    parser.add_argument('--dataset',type=str,required=False)
 
     parser.add_argument("--valid_latex", type=str, default="./latex/valid.tex", help="config files"
     )
