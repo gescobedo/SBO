@@ -1,4 +1,4 @@
-import numpy as np
+#%%import numpy as np
 import pandas as pd
 import os
 from pathlib import Path
@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from data_utils import * 
 from stereo_utils import *
 from constants import *
-
+#%%
 
 def generate_genre_inclination(data,out_dir,name):
     user_groups = {"gender":["M","F"]}
@@ -67,9 +67,56 @@ def core_filtering(data, min_k):
             break
         else:
             data = result
+            print("Iterate filtering")
+            if len(data)<1000:
+                print ("invalid")
+                break
     return result
+
+def generate_small_lfm(n_user=1000,random_state=42):
+    data_inter = pd.read_csv(ROOT_DIR/"lfm-multi-attr/Gustavo-2023-09-v2/inter.tsv.bz2",sep="\t",names=["userID","itemID","freq"],engine="python")
+    data_user = pd.read_csv(ROOT_DIR/"lfm-multi-attr/Gustavo-2023-09-v2/demo.tsv.bz2",sep="\t",names=["userID","country","age","gender","created_at"],engine="python")
+    joined = data_inter.merge(data_user[["userID","gender"]], on="userID")
+    joined["gender"] = joined["gender"].str.upper()
+    sampled_users =  joined.groupby(["gender"]).apply(lambda x : np.random.choice(x["userID"].unique(),n_user//2,replace=False)).explode().values
+    joined = joined[joined["userID"].isin(sampled_users)]
+    print(joined.nunique())
+    name= f'lfm-100k-{n_user}'
+    joined=core_filtering(joined,K_CORE)
+    out_dir = f"{ROOT_DIR}/obfuscation/{name}"
+    if  not os.path.exists(f"{ROOT_DIR}/obfuscation/{name}"):
+        os.makedirs(out_dir)
+    generate_genre_inclination(joined, out_dir,"name")
+    print("Saving filtered dataset")
+    joined.to_csv(f"{ROOT_DIR}/obfuscation/{name}/{name}_inter.csv",index=False)
+    print(joined.nunique())
+    train_data, valid_data, test_data =  split_by_inter_ratio_recbole(joined)
+    save_recbole_data(train_data,valid_data,test_data,out_dir)
+
+def generate_small_ml1m(n_user=1000,random_state=42):
+    data_inter = pd.read_csv(ROOT_DIR/"ml-1m/ratings.dat",sep="::",names=["userID","itemID","rating","timestamp"],engine="python")
+    data_user = pd.read_csv(ROOT_DIR/"ml-1m/users.dat",sep="::",names=["userID","gender","age","occcupation","zipcode"],engine="python") 
+    joined = data_inter.merge(data_user[["userID","gender"]], on="userID").dropna()
+    joined["gender"] = joined["gender"].str.upper()
+    sampled_users =  joined.groupby(["gender"]).apply(lambda x : np.random.choice(x["userID"].unique(),n_user//2,replace=False)).explode().values
+    joined = joined[joined["userID"].isin(sampled_users)]
+    print(joined.nunique())
+    name= f'ml-1m-{n_user}'
+    joined=core_filtering(joined,K_CORE)
+    out_dir = f"{ROOT_DIR}/obfuscation/{name}"
+    if  not os.path.exists(f"{ROOT_DIR}/obfuscation/{name}"):
+        os.makedirs(out_dir)
+    generate_genre_inclination(joined, out_dir,"name")
+    print("Saving filtered dataset")
+    joined.to_csv(f"{ROOT_DIR}/obfuscation/{name}/{name}_inter.csv",index=False)
+    print(joined.nunique())
+    train_data, valid_data, test_data =  split_by_inter_ratio_recbole(joined)
+    save_recbole_data(train_data,valid_data,test_data,out_dir)
+
 
 
 if __name__ == "__main__":
-    preprocess_lfm()
-    preprocess_ml1m()
+    #preprocess_lfm()
+    #preprocess_ml1m()
+    generate_small_lfm()
+    generate_small_ml1m()
