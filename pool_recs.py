@@ -136,7 +136,7 @@ if __name__ == "__main__":
     model = args.model
     models = args.model.split(",")
     dataset_name = args.dataset
-    datasets =[f"{dataset_name}{folder}" for forlder in datasets]
+    datasets =[f"{dataset_name}{folder}" for folder in datasets]
     parameter_dict["data_path"] = args.data_path
     parameter_dict["out_dir"] = args.out_dir
     if  not os.path.exists(args.out_dir):
