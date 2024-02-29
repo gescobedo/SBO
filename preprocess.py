@@ -86,7 +86,7 @@ def generate_small_lfm(n_user=1000,random_state=42):
     out_dir = f"{ROOT_DIR}/obfuscation/{name}"
     if  not os.path.exists(f"{ROOT_DIR}/obfuscation/{name}"):
         os.makedirs(out_dir)
-    generate_genre_inclination(joined, out_dir,"name")
+    generate_genre_inclination(joined, out_dir,name)
     print("Saving filtered dataset")
     joined.to_csv(f"{ROOT_DIR}/obfuscation/{name}/{name}_inter.csv",index=False)
     print(joined.nunique())
@@ -106,7 +106,7 @@ def generate_small_ml1m(n_user=1000,random_state=42):
     out_dir = f"{ROOT_DIR}/obfuscation/{name}"
     if  not os.path.exists(f"{ROOT_DIR}/obfuscation/{name}"):
         os.makedirs(out_dir)
-    generate_genre_inclination(joined, out_dir,"name")
+    generate_genre_inclination(joined, out_dir,name)
     print("Saving filtered dataset")
     joined.to_csv(f"{ROOT_DIR}/obfuscation/{name}/{name}_inter.csv",index=False)
     print(joined.nunique())

@@ -3,7 +3,7 @@ from constants import *
 
 obf_methods=[
     "remove",
-    #"imputate",
+    "imputate",
     #"weighted",
     ]
 sample_methods=[
