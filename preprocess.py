@@ -32,7 +32,7 @@ def preprocess_lfm():
     print(joined.nunique())
     train_data, valid_data, test_data =  split_by_inter_ratio_recbole(joined)
     save_recbole_data(train_data,valid_data,test_data,out_dir)
-
+    save_csr_matrix(out_dir,transform_to_obf(joined))
 def preprocess_ml1m():
     data_inter = pd.read_csv(ROOT_DIR/"ml-1m/ratings.dat",sep="::",names=["userID","itemID","rating","timestamp"],engine="python")
     data_user = pd.read_csv(ROOT_DIR/"ml-1m/users.dat",sep="::",names=["userID","gender","age","occcupation","zipcode"],engine="python")
@@ -49,7 +49,7 @@ def preprocess_ml1m():
     print(joined.nunique())
     train_data, valid_data, test_data =  split_by_inter_ratio_recbole(joined)
     save_recbole_data(train_data,valid_data,test_data,out_dir)
-
+    save_csr_matrix(out_dir,transform_to_obf(joined))
 def core_filtering(data, min_k):
     while(True):
         item_user_counts = data.groupby(["itemID"])["userID"].nunique().reset_index()
@@ -92,6 +92,7 @@ def generate_small_lfm(n_user=1000,random_state=42):
     print(joined.nunique())
     train_data, valid_data, test_data =  split_by_inter_ratio_recbole(joined)
     save_recbole_data(train_data,valid_data,test_data,out_dir)
+    save_csr_matrix(out_dir,transform_to_obf(joined))
 
 def generate_small_ml1m(n_user=1000,random_state=42):
     data_inter = pd.read_csv(ROOT_DIR/"ml-1m/ratings.dat",sep="::",names=["userID","itemID","rating","timestamp"],engine="python")
@@ -112,11 +113,11 @@ def generate_small_ml1m(n_user=1000,random_state=42):
     print(joined.nunique())
     train_data, valid_data, test_data =  split_by_inter_ratio_recbole(joined)
     save_recbole_data(train_data,valid_data,test_data,out_dir)
-
+    save_csr_matrix(out_dir,transform_to_obf(joined))
 
 
 if __name__ == "__main__":
-    #preprocess_lfm()
-    #preprocess_ml1m()
+    preprocess_lfm()
+    preprocess_ml1m()
     generate_small_lfm()
     generate_small_ml1m()

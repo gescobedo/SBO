@@ -6,6 +6,7 @@ from pathlib import Path
 import seaborn as sns
 from pd_utils import filter_by
 import matplotlib.pyplot as plt
+from scipy import sparse as sp
 
 def split_by_inter_ratio(data, ratio=0.8, random_state=42,user_key="userID"
                         ):
@@ -55,10 +56,10 @@ def read_dataset_to_obfuscate(data_dir):
     train_data=transform_to_obf(pd.read_csv(train_data_url))
     valid_data=transform_to_obf(pd.read_csv(valid_data_url))
     test_data=transform_to_obf(pd.read_csv(test_data_url))
-    unique_users =train_data["userID"].unique()
+    user_data =train_data.drop_duplicates(["userID","gender"]).reset_index()[["userID","gender"]]
     inclination_data = pd.read_csv(incl_data_url, index_col="itemID")
-    
-    return train_data, valid_data, test_data, inclination_data, unique_users, dataset_name
+  
+    return train_data, valid_data, test_data, inclination_data, user_data, dataset_name
 #%%
 def transform_to_recbole(data):
     recbole_map = {
@@ -87,8 +88,38 @@ def transform_to_obf(data):
     data.rename(columns=recbole_map,inplace=True )
     return data
     
+def save_csr_matrix(data_dir, interactions):
+
+    unique_items = interactions["itemID"].unique()
+    print(f"n_items: {len(unique_items)}")
+    item2token = pd.Series(unique_items)
+    token2item = pd.Series(data=item2token.index, index=item2token.values)
+    
+    unique_users = interactions["userID"].unique()
+    user2token = pd.Series(unique_users)
+    token2user = pd.Series(data=user2token.index, index=user2token.values)
     
     
+    #print(interactions.head())
+    # assigning unique ids 
+    interactions.loc[:,"userID"] = token2user.loc[interactions.loc[:,"userID"]].values
+    interactions.loc[:,"itemID"] = token2item.loc[interactions.loc[:,"itemID"]].values
+    
+    user_info = interactions.drop_duplicates(["userID"])
+
+    uids_iids_array = interactions[["userID","itemID"]].values
+    n_users,n_items = interactions.userID.nunique(),len(unique_items) 
+    data = np.ones(uids_iids_array.shape[0],dtype=np.int8)
+
+    uids,iids = uids_iids_array[:,0],uids_iids_array[:,1]
+    interaction_matrix = sp.csr_matrix((data, (uids, iids)), 
+                                        (n_users, n_items))
+    sp.save_npz(os.path.join(data_dir, "interactions.npz"),interaction_matrix)
+    user_info.to_csv(os.path.join(data_dir, "user_info.csv"),index=False)
+    token2item.to_csv(os.path.join(data_dir,"item_mapping.csv"))
+    token2user.to_csv(os.path.join(data_dir,"user_mapping.csv"))
+
+   
     
 
 # %%
