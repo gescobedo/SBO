@@ -8,14 +8,17 @@ import matplotlib.pyplot as plt
 from data_utils import * 
 from stereo_utils import *
 from constants import *
+from obfuscation import *
+
 #%%
+
 
 def generate_genre_inclination(data,out_dir,name):
     user_groups = {"gender":["M","F"]}
     rel_freq  = calc_rel_freq_inter(data,user_groups)
     ff = calculate_ff(rel_freq,"gender_M","gender_F")
     ff.to_csv(Path(out_dir)/f"{name}_gender_incl.csv")  
-    
+    return ff
 def preprocess_lfm():
     data_inter = pd.read_csv(ROOT_DIR/"lfm-multi-attr/Gustavo-2023-09-v2/inter.tsv.bz2",sep="\t",names=["userID","itemID","freq"],engine="python")
     data_user = pd.read_csv(ROOT_DIR/"lfm-multi-attr/Gustavo-2023-09-v2/demo.tsv.bz2",sep="\t",names=["userID","country","age","gender","created_at"],engine="python")
@@ -26,13 +29,17 @@ def preprocess_lfm():
     out_dir = f"{ROOT_DIR}/obfuscation/lfm-100k"
     if  not os.path.exists(f"{ROOT_DIR}/obfuscation/lfm-100k"):
         os.makedirs(out_dir)
-    generate_genre_inclination(joined, out_dir,"lfm-100k")
+    inclination_data = generate_genre_inclination(joined, out_dir,"lfm-100k")
     print("Saving filtered dataset")
     joined.to_csv(f"{ROOT_DIR}/obfuscation/lfm-100k/lfm-100k_inter.csv",index=False)
     print(joined.nunique())
     train_data, valid_data, test_data =  split_by_inter_ratio_recbole(joined)
+    user_dataset=transform_to_obf(pd.concat([train_data,valid_data],ignore_index=True))
+    user_stereo_scores = calc_all_user_stereotyp_pref(user_dataset,inclination_data)
+    user_stereo_scores.to_csv(f"{ROOT_DIR}/obfuscation/lfm-100k/lfm-100k_user_ster.csv")
     save_recbole_data(train_data,valid_data,test_data,out_dir)
     save_csr_matrix(out_dir,transform_to_obf(joined))
+
 def preprocess_ml1m():
     data_inter = pd.read_csv(ROOT_DIR/"ml-1m/ratings.dat",sep="::",names=["userID","itemID","rating","timestamp"],engine="python")
     data_user = pd.read_csv(ROOT_DIR/"ml-1m/users.dat",sep="::",names=["userID","gender","age","occcupation","zipcode"],engine="python")
@@ -43,11 +50,14 @@ def preprocess_ml1m():
     out_dir = f"{ROOT_DIR}/obfuscation/ml-1m"
     if  not os.path.exists(f"{ROOT_DIR}/obfuscation/ml-1m"):
         os.makedirs(out_dir)
-    generate_genre_inclination(joined, out_dir,"ml-1m")
+    inclination_data = generate_genre_inclination(joined, out_dir,"ml-1m")
     print("Saving filtered dataset")
     joined.to_csv(f"{ROOT_DIR}/obfuscation/ml-1m/ml-1m_inter.csv",index=False)
     print(joined.nunique())
     train_data, valid_data, test_data =  split_by_inter_ratio_recbole(joined)
+    user_dataset=transform_to_obf(pd.concat([train_data,valid_data],ignore_index=True))
+    user_stereo_scores = calc_all_user_stereotyp_pref(user_dataset,inclination_data)
+    user_stereo_scores.to_csv(f"{ROOT_DIR}/obfuscation/ml-1m/ml-1m_user_ster.csv")
     save_recbole_data(train_data,valid_data,test_data,out_dir)
     save_csr_matrix(out_dir,transform_to_obf(joined))
 def core_filtering(data, min_k):
@@ -86,11 +96,14 @@ def generate_small_lfm(n_user=1000,random_state=42):
     out_dir = f"{ROOT_DIR}/obfuscation/{name}"
     if  not os.path.exists(f"{ROOT_DIR}/obfuscation/{name}"):
         os.makedirs(out_dir)
-    generate_genre_inclination(joined, out_dir,name)
+    inclination_data = generate_genre_inclination(joined, out_dir,name)
     print("Saving filtered dataset")
     joined.to_csv(f"{ROOT_DIR}/obfuscation/{name}/{name}_inter.csv",index=False)
     print(joined.nunique())
     train_data, valid_data, test_data =  split_by_inter_ratio_recbole(joined)
+    user_dataset=transform_to_obf(pd.concat([train_data,valid_data],ignore_index=True))
+    user_stereo_scores = calc_all_user_stereotyp_pref(user_dataset,inclination_data)
+    user_stereo_scores.to_csv(f"{ROOT_DIR}/obfuscation/{name}/{name}_user_ster.csv")
     save_recbole_data(train_data,valid_data,test_data,out_dir)
     save_csr_matrix(out_dir,transform_to_obf(joined))
 
@@ -107,17 +120,20 @@ def generate_small_ml1m(n_user=1000,random_state=42):
     out_dir = f"{ROOT_DIR}/obfuscation/{name}"
     if  not os.path.exists(f"{ROOT_DIR}/obfuscation/{name}"):
         os.makedirs(out_dir)
-    generate_genre_inclination(joined, out_dir,name)
+    inclination_data = generate_genre_inclination(joined, out_dir,name)
     print("Saving filtered dataset")
     joined.to_csv(f"{ROOT_DIR}/obfuscation/{name}/{name}_inter.csv",index=False)
     print(joined.nunique())
     train_data, valid_data, test_data =  split_by_inter_ratio_recbole(joined)
+    user_dataset=transform_to_obf(pd.concat([train_data,valid_data],ignore_index=True))
+    user_stereo_scores = calc_all_user_stereotyp_pref(user_dataset,inclination_data)
+    user_stereo_scores.to_csv(f"{ROOT_DIR}/obfuscation/{name}/{name}_user_ster.csv")
     save_recbole_data(train_data,valid_data,test_data,out_dir)
     save_csr_matrix(out_dir,transform_to_obf(joined))
 
 
 if __name__ == "__main__":
-    preprocess_lfm()
-    preprocess_ml1m()
+    #preprocess_lfm()
+    #preprocess_ml1m()
     generate_small_lfm()
     generate_small_ml1m()

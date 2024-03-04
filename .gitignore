@@ -160,3 +160,5 @@ cython_debug/
 log/
 log_tensorboard/
 wandb/
+data/
+*.csv

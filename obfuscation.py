@@ -11,6 +11,8 @@ from pd_utils import filter_by
 import matplotlib.pyplot as plt
 from data_utils import *
 import json
+from constants import *
+from stereo_utils import  *
 
 def perform_action(user_data, sample, method="remove"):
     # print([sample,user_data])
@@ -19,7 +21,9 @@ def perform_action(user_data, sample, method="remove"):
     elif method == "imputate":
         # print(user_data)
         user_data = np.unique(np.concatenate((user_data, sample)))
-
+    elif method == "weight":
+        # print(user_data)
+        user_data = np.unique(np.concatenate((user_data, sample)))
     else:
         raise Exception("Not implemented action method!")
 
@@ -87,28 +91,6 @@ def perform_sub_sampling(user_data, ff_values, method ="remove",sub_method="topk
     return user_data
 
 
-def calc_user_stereotyp_pref(ff_values, method="mean"):
-    user_stereo = -1.05
-    if len(ff_values > 0):
-        if method == "mean":
-            user_stereo = np.mean(ff_values)
-        elif method == "median":
-            user_stereo = np.median(ff_values)
-        elif method == "diff":
-            user_stereo = (
-                np.sum(
-                    (np.where(ff_values >= 0)) - np.sum(np.abs(np.where(ff_values < 0)))
-                )
-                / 2
-            )
-        elif method == "inc_ratio":
-            user_stereo = (np.sum(np.where(ff_values >= 0)) / np.sum(np.abs(np.where(ff_values < 0))))
-        else:
-            raise Exception("Not implemented stereotypical user preferences measure")
-
-    return user_stereo
-
-
 def obfuscate_user_data(
     user_data,
     ff_data,
@@ -157,6 +139,25 @@ def prepare_user_to_obf(user, train_data,ff_data,sterotyp_method):
         user_ff_values.values, method=sterotyp_method
     )
     return user_data, valid_user_items, user_ff_values, user_stereo_pref
+
+def calculate_dataset_stereotyp_score(user_dataset,ff_data,sterotyp_method):
+    unique_users= user_dataset["userID"].unique()
+    user_ster = pd.Series(index =unique_users,data=np.zeros(len(unique_users)), name="user_ster")
+    user_ster.index.name = "userID"
+    for user in unique_users:
+        user_data = user_dataset.loc[user_dataset["userID"] == user]
+        # Selecting only items that have defined FF values from the user profile
+        valid_user_items = np.intersect1d(
+            user_data["itemID"].values, ff_data.index.values
+        )
+        #print(len(valid_user_items),len(ff_data))
+        user_ff_values = ff_data.loc[valid_user_items]
+        # Estimating the stereotypicallity of the user profile
+        user_stereo_pref = calc_user_stereotyp_pref(
+            user_ff_values.values, method=sterotyp_method
+        )
+        user_ster.loc[user]=user_stereo_pref
+    return user_ster
 def obfuscate_data(
     train_data,
     users,
@@ -198,6 +199,7 @@ def obfuscate_data(
     obfuscated_data = pd.DataFrame(
         data=users_obfuscated, columns=["userID", "itemID"]
     ).explode("itemID",ignore_index=True)
+    user_ster = calculate_dataset_stereotyp_score(obfuscated_data,ff_data,sterotyp_method)
     print(
         [
             len(train_data),
@@ -211,7 +213,8 @@ def obfuscate_data(
             n_obfuscated,
         ]
     )
-    return obfuscated_data
+    
+    return obfuscated_data, user_ster
 
 
 def run_obfuscation(
@@ -230,7 +233,7 @@ def run_obfuscation(
     print(user_features.head())
     out_file = f"{dataset_name}_{obf_method}_{p_sample}_{sample_method}_{stereo_type}_th{user_stereo_pref_thresh}"
     inter_data = pd.concat([train_data, valid_data], ignore_index=True)
-    obf_data = obfuscate_data(
+    obf_data, user_ster = obfuscate_data(
         inter_data,
         user_features["userID"].values,
         inclination_data,
@@ -250,6 +253,7 @@ def run_obfuscation(
     # Splitting and saving obfuscated data
     obf_data = obf_data.merge(user_features, on="userID",how="left")
     train_data_obf, valid_data_obf = split_by_inter_ratio(obf_data)
+    
     save_recbole_data(train_data_obf,valid_data_obf,test_data,out_dir)
     config_dict={
         "p_sample":p_sample,
@@ -260,6 +264,7 @@ def run_obfuscation(
         "user_stereo_pref_thresh":user_stereo_pref_thresh,
         }
     save_csr_matrix(out_dir,obf_data)
+    user_ster.to_csv(f"{out_dir}/{out_file}_user_ster.csv")
     inclination_data.to_csv(f"{out_dir}/{out_file}_gender_incl.csv",)
     with open(f"{out_dir}/config.json", 'w') as f:
         json.dump(config_dict, f)
