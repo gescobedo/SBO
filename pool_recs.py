@@ -109,7 +109,7 @@ if __name__ == "__main__":
     parser.add_argument('--out_dir',required=False)
     parser.add_argument('--gpu',type=int,required=False)
     parser.add_argument('--dataset',type=str,required=False)
-    parser.add_argument('--wandb',type=bool,required=False, default=True)
+    parser.add_argument('--wandb',action="store_true")
 
     parser.add_argument("--valid_latex", type=str, default="./latex/valid.tex", help="config files"
     )
@@ -135,8 +135,8 @@ if __name__ == "__main__":
         help="the global rank offset of this group",
     )
     args = parser.parse_args()
-    wandb = args.wandb 
-    if not wandb :
+    
+    if args.wandb  :
         parameter_dict["log_wandb"]= True 
     model = args.model
     models = args.model.split(",")
