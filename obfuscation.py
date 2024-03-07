@@ -20,20 +20,22 @@ def perform_action(user_data, sample, method="remove"):
         user_data = np.setdiff1d(user_data, sample)
     elif method == "imputate":
         # print(user_data)
-        user_data = np.unique(np.concatenate((user_data, sample)))
-    elif method == "weight":
+        if len(sample)>0:
+            user_data = np.unique(np.concatenate((user_data, sample)))
+    elif method == "weighted":
         # print(user_data)
-        user_data = np.unique(np.concatenate((user_data, sample)))
+        user_data = perform_action(user_data, sample[0],"imputate")
+        user_data = perform_action(user_data, sample[1],"remove")
     else:
         raise Exception("Not implemented action method!")
 
     return user_data
 
 
-def perform_sub_sampling(user_data, ff_values, method ="remove",sub_method="topk", k=50, p_sample=0.1):
+def perform_sub_sampling(user_data, ff_values, method ="remove",sub_method="topk", k=50, p_sample=0.1,weights=[0.5,0.5]):
     if method =="remove":
         if sub_method == "topk":
-            ff_user_data = ff_values.loc[user_data].sort_values(ascending=False)
+            ff_user_data = ff_values.loc[user_data].sort_values("FF",ascending=False)
             size_sample = int(p_sample * len(user_data))
             if size_sample <= k:
                 top_k = ff_user_data[:size_sample]
@@ -45,10 +47,18 @@ def perform_sub_sampling(user_data, ff_values, method ="remove",sub_method="topk
                 user_data, int(p_sample * len(user_data)), replace=False
             )
         elif sub_method == "ff":
+            ff_user_data = ff_values.loc[user_data].sort_values("FF",ascending=False)
+            size_sample = int(p_sample * len(user_data))
+            
             user_data = np.random.choice(
                 user_data, int(p_sample * len(user_data)), replace=False
             )
-            # print(ff_values.loc[user_data])
+            if size_sample <= k:
+                top_k = ff_user_data[:size_sample]
+            else:
+                top_k = ff_user_data[:k]
+            user_data = top_k.index.values
+                
             coins = np.array(
                 [np.random.binomial(1, np.abs(p), 1)[0] for p in ff_values.loc[user_data].values]
             )
@@ -62,31 +72,49 @@ def perform_sub_sampling(user_data, ff_values, method ="remove",sub_method="topk
         # This should only focus on unseen data there
         if sub_method == "topk":
             ff_unseen_user_data = np.setdiff1d(ff_values.index.values,user_data)
-            ff_unseen_data= ff_values.loc[ff_unseen_user_data].sort_values(ascending=False)
+            ff_unseen_data= ff_values.loc[ff_unseen_user_data].sort_values("FF",ascending=False)
             size_sample = int(p_sample * len(user_data))
             if size_sample <= k:
                 top_k = ff_unseen_data[:size_sample]
             else:
                 top_k = ff_unseen_data[:k]
             user_data = top_k
+            
         elif sub_method == "random":
             unseen_user_data = np.setdiff1d(ff_values.index.values,user_data)
             user_data = np.random.choice(
                 unseen_user_data, int(p_sample * len(user_data)), replace=False
             )
         elif sub_method == "ff":
-            user_data = np.random.choice(
-                user_data, int(p_sample * len(user_data)), replace=False
-            )
+            ff_unseen_user_data = np.setdiff1d(ff_values.index.values,user_data)
+            ff_unseen_data= ff_values.loc[ff_unseen_user_data].sort_values("FF",ascending=False)
+            size_sample = int(p_sample * len(user_data))
+            if size_sample <= k:
+                top_k = ff_unseen_data[:size_sample]
+            else:
+                top_k = ff_unseen_data[:k]
+            user_data = top_k.index.values
+            #user_data = np.random.choice(
+            #    user_data, int(p_sample * len(user_data)), replace=False
+            #)
             # print(ff_values.loc[user_data])
+            #print(ff_values.loc[user_data])
             coins = np.array(
-                [np.random.binomial(1, np.abs(p), 1)[0] for p in ff_values.loc[user_data]]
+                [np.random.binomial(1, np.abs(p), 1)[0] for p in ff_values.loc[user_data].values]
             )
             # print([len(user_data),coins,np.nonzero(coins)])
             user_data = user_data[np.nonzero(coins)[0]]
 
         else:
             raise Exception("Not implemented sampling method!")
+    elif method == "weighted":
+        imp = perform_sub_sampling(user_data, ff_values, "imputate",sub_method, k,weights[0]*p_sample)
+        rem = perform_sub_sampling(user_data, ff_values, "remove",sub_method, k,weights[1]*p_sample)
+        #print(imp)
+        #print(rem)
+        user_data = imp, rem
+    else:
+        raise Exception("Not implemented sampling method!")
 
     return user_data
 
@@ -127,13 +155,27 @@ def obfuscate_user_data(
     else:
         return user_data
 
-def prepare_user_to_obf(user, train_data,ff_data,sterotyp_method):
+def get_matching_ff_values(attribute, attribute_value, ff_values_attr):
+    # TODO in order to generalize ff_values should be a dataframe and handled differently
+    # This is a quick fix only for gender 
+    # This function should give as outcome the matching user attribute value ff values  
+    if attribute_value== "M":
+        return ff_values_attr
+    elif attribute_value == "F":    
+        return ( -1*ff_values_attr)
+        
+def prepare_user_to_obf(user, train_data,ff_data,sterotyp_method,attribute="gender"):
     user_data = train_data.loc[train_data["userID"] == user]
+    
+    user_attribute_value= user_data[attribute].values[0]
+    #print(ff_data)
+    ff_data = get_matching_ff_values(attribute,user_attribute_value,ff_data)
+
     # Selecting only items that have defined FF values from the user profile
     valid_user_items = np.intersect1d(
         user_data["itemID"].values, ff_data.index.values
     )
-    user_ff_values = ff_data.loc[valid_user_items, "FF"]
+    user_ff_values = ff_data.loc[valid_user_items]
     # Estimating the stereotypicallity of the user profile
     user_stereo_pref = calc_user_stereotyp_pref(
         user_ff_values.values, method=sterotyp_method
@@ -168,7 +210,16 @@ def obfuscate_data(
     sub_method="ff",
     sterotyp_method="mean",
     user_stereo_pref_thresh=0.005,
+    weights=[0.5,0.5]
 ):
+    print([ x for x in  ("Processing :",p_SAMPLE,
+            topk,
+            method,
+            sub_method,
+            user_stereo_pref_thresh,
+            )]
+        
+    )    
     n_obfuscated = 0
     users_obfuscated = []
     for user in users:
@@ -177,15 +228,17 @@ def obfuscate_data(
         user_data, valid_user_items, user_ff_values, user_stereo_pref = prepare_user_to_obf(user, train_data,ff_data,sterotyp_method)
 
         # Sampling for users that have reached stereotypical preference threshold
-        if abs(user_stereo_pref) > user_stereo_pref_thresh:
+        if user_stereo_pref > user_stereo_pref_thresh:
             n_obfuscated += 1
             # Sampling from user profile
             user_sampled = perform_sub_sampling(
                 user_data=valid_user_items,
-                ff_values=ff_data,
+                ff_values=user_ff_values,
+                method=method,
                 sub_method=sub_method,
                 k=topk,
                 p_sample=p_SAMPLE,
+                weights=weights
             )
             # Perform obfuscation
             obfuscated_user_data = perform_action(
@@ -226,11 +279,12 @@ def run_obfuscation(
     sample_method="ff",
     stereo_type="mean",
     user_stereo_pref_thresh=0.01,
+    weights=[0.5, 0.5],
 ):
     train_data, valid_data, test_data, inclination_data, user_features, dataset_name = (
         read_dataset_to_obfuscate(data_dir)
     )
-    print(user_features.head())
+    #print(user_features.head())
     out_file = f"{dataset_name}_{obf_method}_{p_sample}_{sample_method}_{stereo_type}_th{user_stereo_pref_thresh}"
     inter_data = pd.concat([train_data, valid_data], ignore_index=True)
     obf_data, user_ster = obfuscate_data(

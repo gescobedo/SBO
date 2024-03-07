@@ -8,7 +8,7 @@ K_CORE = 5
 OBF_METHODS=[
     "remove",
     "imputate",
-    #"weighted",
+    "weighted",
     ]
 SAMPLE_METHODS=[
     "ff",
@@ -18,8 +18,10 @@ SAMPLE_METHODS=[
 STEREO_TYPES = [
     "mean", 
     "median",
-    "inc_ratio",
+    "mean-abs", 
+    "median-abs",
+    #"inc_ratio",
     ]
 USER_STEREO_THRES= [0.5, 0.25, 0.1, 0.005, 0.0025]
-P_SAMPLE = [0.05, 0.10, 0.15]
+P_SAMPLE = [0.05, 0.10] #,0.15]
 TOPK=[50, 100]
