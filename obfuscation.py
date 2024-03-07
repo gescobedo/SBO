@@ -72,7 +72,7 @@ def perform_sub_sampling(user_data, ff_values, method ="remove",sub_method="topk
         # This should only focus on unseen data there
         if sub_method == "topk":
             ff_unseen_user_data = np.setdiff1d(ff_values.index.values,user_data)
-            ff_unseen_data= ff_values.loc[ff_unseen_user_data].sort_values("FF",ascending=False)
+            ff_unseen_data= ff_values.loc[ff_unseen_user_data].sort_values("FF",ascending=True)
             size_sample = int(p_sample * len(user_data))
             if size_sample <= k:
                 top_k = ff_unseen_data[:size_sample]
@@ -87,7 +87,7 @@ def perform_sub_sampling(user_data, ff_values, method ="remove",sub_method="topk
             )
         elif sub_method == "ff":
             ff_unseen_user_data = np.setdiff1d(ff_values.index.values,user_data)
-            ff_unseen_data= ff_values.loc[ff_unseen_user_data].sort_values("FF",ascending=False)
+            ff_unseen_data= ff_values.loc[ff_unseen_user_data].sort_values("FF",ascending=True)
             size_sample = int(p_sample * len(user_data))
             if size_sample <= k:
                 top_k = ff_unseen_data[:size_sample]

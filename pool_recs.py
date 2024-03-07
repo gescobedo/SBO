@@ -9,12 +9,12 @@ from tqdm import tqdm
 from recbole.quick_start import run_recbole, run_recboles# run_recbole_conf
 import torch
 from joblib import delayed, Parallel
-from recbole.utils import list_to_latex
+from recbole.utils import list_to_latex,get_local_time
 from pathlib import Path
-
+import json
 config_base = {}
 datasets  = [
-        #'',
+        '',
         #'_remove_0.05_ff_median_th0.005', 
         #'_remove_0.1_ff_median_th0.005', 
         #'_remove_0.15_ff_median_th0.005',
@@ -40,7 +40,7 @@ parameter_dict = {
     "save_dataset": True,
     "save_dataloaders": True,
     "embedding_size": 64,
-    "epochs": 100, 
+    "epochs": 2, 
     "train_batch_size": 512,
     "eval_batch_size": 2048, 
     "benchmark_filename": ['train','valid','test'] ,
@@ -143,18 +143,21 @@ if __name__ == "__main__":
     dataset_name = args.dataset
     datasets =[f"{dataset_name}{folder}" for folder in datasets]
     parameter_dict["data_path"] = args.data_path
-    parameter_dict["out_dir"] = args.out_dir
-    if  not os.path.exists(args.out_dir):
-        os.makedirs(args.out_dir)
+    out_dir = args.out_dir+"/"#+get_local_time()+"/"
+
+    parameter_dict["out_dir"] = out_dir
+    if  not os.path.exists(out_dir):
+        os.makedirs(out_dir)
     params = []
     gpu_ids = [1,2,3]*20
     gpu_id = 0
-    
+    #dataset_dict = 
 
     for model in models:
         for dataset in datasets:
             
             config = parameter_dict.copy()
+    
             config["gpu_id"] = args.gpu
             #config["device"] = torch.device(f'cuda:{gpu_ids[gpu_id]}')
             gpu_id+=1    
@@ -206,11 +209,14 @@ if __name__ == "__main__":
 #
     #    valid_result_list.append(valid_res_dict)
     #    test_result_list.append(test_res_dict)
-    print(f"Saving results to {args.out_dir}")
+    print(f"Saving results to {out_dir}")
 
-    if  not os.path.exists("/".join([args.out_dir,dataset_name])):
-        os.makedirs("/".join([args.out_dir,dataset_name]))
+    if  not os.path.exists("/".join([out_dir,dataset_name])):
+        os.makedirs("/".join([out_dir,dataset_name]))
+    datasets_dict = {"datasets":datasets}
+    with open(f"{out_dir}/{dataset_name}/datasets.json", 'w') as fh:
+        json.dump(datasets_dict, fh, indent=4)
     
-    pickle.dump(valid_result_list,open(Path(args.out_dir)/dataset_name/ f"valid_{args.model}_{str(datetime.now())}.pkl","wb"))    
-    pickle.dump(test_result_list,open(Path(args.out_dir)/dataset_name/f"test_{args.model}_{str(datetime.now())}.pkl","wb"))    
+    pickle.dump(valid_result_list,open(Path(out_dir)/dataset_name/ f"valid_{args.model}_{str(datetime.now())}.pkl","wb"))    
+    pickle.dump(test_result_list,open(Path(out_dir)/dataset_name/f"test_{args.model}_{str(datetime.now())}.pkl","wb"))    
     

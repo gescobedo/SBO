@@ -81,6 +81,10 @@ def calc_user_stereotyp_pref(ff_values, method="mean"):
             user_stereo = np.mean(np.abs(ff_values)) #[0:1]
         elif method == "median-abs":
             user_stereo = np.median(np.abs(ff_values)) #[0:1]
+        elif method == "mean-pos":
+            user_stereo = np.mean(np.where(ff_values >= 0)) #[0:1]
+        elif method == "median-pos":
+            user_stereo = np.median(np.where(ff_values >= 0)) #[0:1]    
         elif method == "diff": 
             #[0:1]
             user_stereo = (  
