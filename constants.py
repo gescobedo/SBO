@@ -16,11 +16,11 @@ SAMPLE_METHODS=[
     "topk"
     ]
 STEREO_TYPES = [
-    "mean", 
+    #"mean", 
     "median",
     "mean-abs", 
     "median-abs",
-    #"inc_ratio",
+    "diff",
     ]
 USER_STEREO_THRES= [0.5, 0.25, 0.1, 0.005, 0.0025]
 P_SAMPLE = [0.05, 0.10] #,0.15]

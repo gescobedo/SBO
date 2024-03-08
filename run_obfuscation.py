@@ -1,6 +1,7 @@
 from obfuscation import run_obfuscation 
 from constants import *
-
+from joblib import Parallel,delayed
+from tqdm import tqdm, trange
 
 datasets_source = [
     #ROOT_DIR_STR+"/obfuscation/ml-1m",
@@ -9,33 +10,30 @@ datasets_source = [
     ROOT_DIR_STR+"/obfuscation/lfm-100k-1000",
     ]
 obf_params=[]
-for obf_method in OBF_METHODS:
-    for stereo_type in STEREO_TYPES:
-        for data_dir in datasets_source: 
-            for psample in P_SAMPLE:
-                obf_params.append(
-                    {
-                        "root_dir":ROOT_DIR_STR+"/obfuscation",
-                        "data_dir":data_dir,
-                        "p_sample": psample,
-                        "topk":50,
-                        "obf_method":obf_method,
-                        "sample_method":"topk",
-                        "stereo_type":stereo_type,
-                        "user_stereo_pref_thresh":0.25,
-                        "weights":[0.5, 0.5]
-                    }
-                    )
+for sample_method in SAMPLE_METHODS:
+    for obf_method in OBF_METHODS:
+        for stereo_type in STEREO_TYPES:
+            for data_dir in datasets_source: 
+                for psample in P_SAMPLE:
+                    obf_params.append(
+                        {
+                            "root_dir":ROOT_DIR_STR+"/obfuscation",
+                            "data_dir":data_dir,
+                            "p_sample": psample,
+                            "topk":50,
+                            "obf_method":obf_method,
+                            "sample_method":sample_method,
+                            "stereo_type":stereo_type,
+                            "user_stereo_pref_thresh":0.3,
+                            "weights":[0.5, 0.5]
+                        }
+                        )
 
 
 if __name__ == "__main__":
     folders = []
-    for params in  obf_params:
-       # print(params)
-        train,valid,test, name, folder = run_obfuscation(**params)
-        folders.append(name)
-
-    print(folders)
+    results = Parallel(n_jobs=8, verbose=11)(delayed(run_obfuscation)(**p) for p in tqdm(obf_params, desc="Generating Datasets", position=0, leave=True))
+    print([out_file for (train_data_obf,valid_data_obf,test_data, out_file, out_dir) in results])
 
 
 

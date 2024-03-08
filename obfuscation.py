@@ -21,9 +21,14 @@ def perform_action(user_data, sample, method="remove"):
     elif method == "imputate":
         # print(user_data)
         if len(sample)>0:
+            if len(sample.shape )==2:
+                print(sample)
+                print(user_data)
             user_data = np.unique(np.concatenate((user_data, sample)))
+        
     elif method == "weighted":
         # print(user_data)
+        
         user_data = perform_action(user_data, sample[0],"imputate")
         user_data = perform_action(user_data, sample[1],"remove")
     else:
@@ -78,7 +83,7 @@ def perform_sub_sampling(user_data, ff_values, method ="remove",sub_method="topk
                 top_k = ff_unseen_data[:size_sample]
             else:
                 top_k = ff_unseen_data[:k]
-            user_data = top_k
+            user_data = top_k.index.values
             
         elif sub_method == "random":
             unseen_user_data = np.setdiff1d(ff_values.index.values,user_data)
@@ -108,8 +113,8 @@ def perform_sub_sampling(user_data, ff_values, method ="remove",sub_method="topk
         else:
             raise Exception("Not implemented sampling method!")
     elif method == "weighted":
-        imp = perform_sub_sampling(user_data, ff_values, "imputate",sub_method, k,weights[0]*p_sample)
-        rem = perform_sub_sampling(user_data, ff_values, "remove",sub_method, k,weights[1]*p_sample)
+        imp = perform_sub_sampling(user_data, ff_values, "imputate",sub_method, k,weights[0]*p_sample,weights)
+        rem = perform_sub_sampling(user_data, ff_values, "remove",sub_method, k,weights[1]*p_sample,weights)
         #print(imp)
         #print(rem)
         user_data = imp, rem
@@ -178,9 +183,9 @@ def prepare_user_to_obf(user, train_data,ff_data,sterotyp_method,attribute="gend
     user_ff_values = ff_data.loc[valid_user_items]
     # Estimating the stereotypicallity of the user profile
     user_stereo_pref = calc_user_stereotyp_pref(
-        user_ff_values.values, method=sterotyp_method
+        ff_data.values, method=sterotyp_method
     )
-    return user_data, valid_user_items, user_ff_values, user_stereo_pref
+    return user_data, valid_user_items, ff_data, user_stereo_pref
 
 def calculate_dataset_stereotyp_score(user_dataset,ff_data,sterotyp_method):
     unique_users= user_dataset["userID"].unique()
@@ -322,7 +327,7 @@ def run_obfuscation(
     inclination_data.to_csv(f"{out_dir}/{out_file}_gender_incl.csv",)
     with open(f"{out_dir}/config.json", 'w') as f:
         json.dump(config_dict, f)
-    print("finished obfuscation")
+    print(f"finished obfuscation:{out_dir}")
     #train_data_obf.to_csv(f"{out_dir}/{out_file}.train.inter", index=False)
     #valid_data_obf.to_csv(f"{out_dir}/{out_file}.valid.inter", index=False)
     #test_data.to_csv(f"{out_dir}/{out_file}.test.inter", index=False)
