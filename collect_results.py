@@ -30,10 +30,19 @@ results_files= [
 '/home/gustavoe/obfuscation/ml_small/ml-1m-1000/test_MultiVAE_2024-02-29 11:24:28.270790.pkl',
 '/home/gustavoe/obfuscation/lfm_small/lfm-100k-1000/test_MultiVAE_2024-02-29 11:22:40.385898.pkl',
 ]
+results_files= [
+"/share/rk4/home/gustavoe/obfuscation/full_train/lfm-100k/test_BPR_2024-03-10 19:22:21.434191.pkl",
+#"/share/rk4/home/gustavoe/obfuscation/full_train/lfm-100k/valid_BPR_2024-03-10 19:22:21.426135.pkl",
+#"/share/rk4/home/gustavoe/obfuscation/full_train/ml-1m/valid_BPR_2024-03-09 15:09:43.084835.pkl",
+"/share/rk4/home/gustavoe/obfuscation/full_train/ml-1m/test_BPR_2024-03-09 15:09:43.092869.pkl",
+]
+#%%
+#!find  /share/rk4/home/gustavoe/obfuscation/full_train/ -name *.pkl 
+
 #%%
 DEFAULT_RESULTS_DIR = "/home/gustavoe/obfuscation"
 #results_files = [f"{DEFAULT_RESULTS_DIR}/{file}" for file in results_files]
-
+DEFAULT_RESULTS_DIR = ""
 import pickle
 def convert_table(file):
     for res in file:
