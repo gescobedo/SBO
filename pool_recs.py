@@ -105,7 +105,7 @@ parameter_dict = {
     "save_dataset": True,
     "save_dataloaders": True,
     "embedding_size": 64,
-    "epochs": 2, 
+    "epochs": 100, 
     "train_batch_size": 512,
     "eval_batch_size": 2048, 
     "benchmark_filename": ['train','valid','test'] ,
@@ -174,6 +174,7 @@ if __name__ == "__main__":
     parser.add_argument('--out_dir',required=False)
     parser.add_argument('--gpu',type=int,required=False)
     parser.add_argument('--dataset',type=str,required=False)
+    parser.add_argument('--datasets_file',type=str,required=False,default="NoFile")
     parser.add_argument('--wandb',action="store_true")
 
     parser.add_argument("--valid_latex", type=str, default="./latex/valid.tex", help="config files"
@@ -209,6 +210,10 @@ if __name__ == "__main__":
     datasets =[f"{dataset_name}{folder}" for folder in datasets]
     parameter_dict["data_path"] = args.data_path
     out_dir = args.out_dir+"/"#+get_local_time()+"/"
+    
+    if args.datasets_file != "NoFile":
+        with open(args.datasets_file,"rb") as dt_:
+            datasets = json.load(dt_)["datasets"]
 
     parameter_dict["out_dir"] = out_dir
     if  not os.path.exists(out_dir):

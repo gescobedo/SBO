@@ -31,10 +31,13 @@ results_files= [
 '/home/gustavoe/obfuscation/lfm_small/lfm-100k-1000/test_MultiVAE_2024-02-29 11:22:40.385898.pkl',
 ]
 results_files= [
-"/share/rk4/home/gustavoe/obfuscation/full_train/lfm-100k/test_BPR_2024-03-10 19:22:21.434191.pkl",
-#"/share/rk4/home/gustavoe/obfuscation/full_train/lfm-100k/valid_BPR_2024-03-10 19:22:21.426135.pkl",
-#"/share/rk4/home/gustavoe/obfuscation/full_train/ml-1m/valid_BPR_2024-03-09 15:09:43.084835.pkl",
-"/share/rk4/home/gustavoe/obfuscation/full_train/ml-1m/test_BPR_2024-03-09 15:09:43.092869.pkl",
+# Resulst 2 epochs 
+#"/share/rk4/home/gustavoe/obfuscation/full_train/lfm-100k/test_BPR_2024-03-10 19:22:21.434191.pkl",
+#"/share/rk4/home/gustavoe/obfuscation/full_train/ml-1m/test_BPR_2024-03-09 15:09:43.092869.pkl",
+
+#Results 100 epochs
+#"/share/rk4/home/gustavoe/obfuscation/full_train/ml-1m/valid_BPR_2024-03-12 14:17:52.467143.pkl",
+"/share/rk4/home/gustavoe/obfuscation/full_train/ml-1m/test_BPR_2024-03-12 14:17:52.475587.pkl"
 ]
 #%%
 #!find  /share/rk4/home/gustavoe/obfuscation/full_train/ -name *.pkl 
@@ -76,6 +79,8 @@ for key,data in results_dict.items():
 joined= pd.concat(dfs,axis=0,ignore_index=True)
 print(joined.head())
 #%%
-joined.to_csv("result_table-right.csv",index=False)
+joined.to_csv("/share/rk4/home/gustavoe/obfuscation/full_train/result_BPR.csv",index=False)
 
 
+
+# %%

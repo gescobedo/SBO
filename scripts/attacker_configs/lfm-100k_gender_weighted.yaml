@@ -1,7 +1,7 @@
 #extends: "default.yaml"
 
 fixed_params:
-  epochs: 25
+  epochs: 50
 
   data_loader:
     batch_size: 64
@@ -12,7 +12,7 @@ fixed_params:
   atk_groups:
     - feature: "gender"   # select which feature to attack
       type: "categorical"
-      dims: [ 128, 2]
+      dims: [ 256, 2]
       activation_fn: "relu"
       input_dropout: 0.0
       loss_fn: "ce"
