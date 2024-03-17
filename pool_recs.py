@@ -121,7 +121,7 @@ parameter_dict = {
     #},
     "use_gpu":True,
     #"device": torch.device('cpu')
-    #"nproc":8,
+    "nproc":1,
     #"gpu_id": '1,2,3',
     "log_wandb": False     
 }

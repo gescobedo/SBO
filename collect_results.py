@@ -37,10 +37,14 @@ results_files= [
 
 #Results 100 epochs
 #"/share/rk4/home/gustavoe/obfuscation/full_train/ml-1m/valid_BPR_2024-03-12 14:17:52.467143.pkl",
-"/share/rk4/home/gustavoe/obfuscation/full_train/ml-1m/test_BPR_2024-03-12 14:17:52.475587.pkl"
+"/share/rk4/home/gustavoe/obfuscation/full_train/ml-1m/test_BPR_2024-03-12 14:17:52.475587.pkl",
+'/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/lfm-100k/test_BPR_2024-03-15 03:23:07.718920.pkl',
+'/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/lfm-100k/test_BPR_2024-03-17 09:50:47.250257.pkl',
 ]
 #%%
 #!find  /share/rk4/home/gustavoe/obfuscation/full_train/ -name *.pkl 
+
+
 
 #%%
 DEFAULT_RESULTS_DIR = "/home/gustavoe/obfuscation"
