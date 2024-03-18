@@ -13,5 +13,8 @@ conda activate recbole-bert
 
 #tmux new 'export CUDA_VISIBLE_DEVICES=2 ; python pool_recs.py --model LightGCN --data_path /share/hel/datasets/cf_obfuscation/ --out_dir /home/gustavoe/obfuscation/sample_test/ --nproc 3 --gpu 2'
 
-tmux new -d 'export CUDA_VISIBLE_DEVICES=1 ; python pool_recs.py --model BPR --dataset lfm-100k --data_path /share/hel/datasets/cf_obfuscation/ --out_dir /home/gustavoe/obfuscation/all_test_mean_stereo/ --datasets_file /home/gustavoe/all_test_mean_stereo/lfm-100k/datasets.json --nproc 7 --gpu 1'
+tmux new -d 'export CUDA_VISIBLE_DEVICES=0 ; python pool_recs.py --model MultiVAE --dataset lfm-100k --data_path /share/hel/datasets/cf_obfuscation/ --out_dir /home/gustavoe/obfuscation/all_test_mean_stereo/ --datasets_file /home/gustavoe/all_test_mean_stereo/lfm-100k/datasets.part0.json --nproc 3 --gpu 1'
+tmux new -d 'export CUDA_VISIBLE_DEVICES=1 ; python pool_recs.py --model MultiVAE --dataset lfm-100k --data_path /share/hel/datasets/cf_obfuscation/ --out_dir /home/gustavoe/obfuscation/all_test_mean_stereo/ --datasets_file /home/gustavoe/all_test_mean_stereo/lfm-100k/datasets.part1.json --nproc 3 --gpu 1'
+tmux new -d 'export CUDA_VISIBLE_DEVICES=2 ; python pool_recs.py --model MultiVAE --dataset lfm-100k --data_path /share/hel/datasets/cf_obfuscation/ --out_dir /home/gustavoe/obfuscation/all_test_mean_stereo/ --datasets_file /home/gustavoe/all_test_mean_stereo/lfm-100k/datasets.part2.json --nproc 3 --gpu 1'
+tmux new -d 'export CUDA_VISIBLE_DEVICES=3 ; python pool_recs.py --model MultiVAE --dataset lfm-100k --data_path /share/hel/datasets/cf_obfuscation/ --out_dir /home/gustavoe/obfuscation/all_test_mean_stereo/ --datasets_file /home/gustavoe/all_test_mean_stereo/lfm-100k/datasets.part3.json --nproc 3 --gpu 1'
     
