@@ -50,11 +50,29 @@ results_files_split = {
         "/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/ml-1m/test_MultiVAE_2024-03-19 12:13:31.096683.pkl",
         "/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/ml-1m/test_MultiVAE_2024-03-19 11:43:30.072991.pkl",
     ],
-    "LIGHTGCN_REMOVAL_ML-1M": [
+    
+    "LIGHTGCN_ALL": [
+    #"LIGHTGCN_ALL_ML": [
         "/share/rk1/home/marta/obfuscation/all_test_mean_stereo/ml-1m/test_LightGCN_2024-03-18 22:42:08.663277.pkl",
         "/share/rk1/home/marta/obfuscation/all_test_mean_stereo/ml-1m/test_LightGCN_2024-03-18 22:56:09.040045.pkl",
         "/share/rk1/home/marta/obfuscation/all_test_mean_stereo/ml-1m/test_LightGCN_2024-03-18 23:13:16.421693.pkl",
-    ],
+        '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/ml-1m/test_LightGCN_2024-03-19 15:58:51.825415.pkl',
+        '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/ml-1m/test_LightGCN_2024-03-20 01:59:50.394038.pkl',
+        '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/ml-1m/test_LightGCN_2024-03-19 18:17:55.676498.pkl',
+        '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/ml-1m/test_LightGCN_2024-03-19 18:36:27.204649.pkl',
+        '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/ml-1m/test_LightGCN_2024-03-20 02:16:17.005938.pkl',
+        '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/ml-1m/test_LightGCN_2024-03-20 02:01:17.518307.pkl',
+        '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/ml-1m/test_LightGCN_2024-03-19 18:15:36.283061.pkl',
+    #]        
+    #    ,
+    #"LIGHTGCN_ALL_LFM": [
+        '/share/rk1/home/marta/obfuscation/all_test_mean_stereo/lfm-100k/test_LightGCN_2024-03-20 09:00:54.502815.pkl',
+        '/share/rk1/home/marta/obfuscation/all_test_mean_stereo/lfm-100k/test_LightGCN_2024-03-20 08:43:34.292164.pkl',
+        '/share/rk1/home/marta/obfuscation/all_test_mean_stereo/lfm-100k/test_LightGCN_2024-03-20 08:54:39.506348.pkl',
+        '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/lfm-100k/test_LightGCN_2024-03-19 19:03:43.902098.pkl',
+        '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/lfm-100k/test_LightGCN_2024-03-20 14:02:35.848509.pkl',
+    ]
+    
 }
 results_files = []
 [[results_files.append(x) for x in row] for row in list(results_files_split.values())]
