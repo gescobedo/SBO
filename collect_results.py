@@ -71,8 +71,35 @@ results_files_split = {
         '/share/rk1/home/marta/obfuscation/all_test_mean_stereo/lfm-100k/test_LightGCN_2024-03-20 08:54:39.506348.pkl',
         '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/lfm-100k/test_LightGCN_2024-03-19 19:03:43.902098.pkl',
         '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/lfm-100k/test_LightGCN_2024-03-20 14:02:35.848509.pkl',
-    ]
-    
+        '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/lfm-100k/test_LightGCN_2024-03-20 22:48:24.656040.pkl',
+        '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/lfm-100k/test_LightGCN_2024-03-20 23:29:27.089267.pkl',
+        '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/lfm-100k/test_LightGCN_2024-03-21 00:02:43.450565.pkl',
+        '/share/rk1/home/marta/obfuscation/all_test_mean_stereo/lfm-100k/test_LightGCN_2024-03-21 03:42:37.346763.pkl',
+        '/share/rk1/home/marta/obfuscation/all_test_mean_stereo/lfm-100k/test_LightGCN_2024-03-21 03:16:54.537905.pkl',
+         
+    ],
+    # Perblur all
+    "PERBLUR_ALL":
+    [
+        '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/lfm-100k/test_MultiVAE_2024-03-21 13:59:40.285182.pkl',
+        '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/lfm-100k/test_BPR_2024-03-21 14:05:38.364587.pkl',
+        '/share/rk1/home/marta/obfuscation/all_test_mean_stereo/lfm-100k/test_LightGCN_2024-03-21 14:56:00.072387.pkl',
+        '/share/rk1/home/marta/obfuscation/all_test_mean_stereo/ml-1m/test_BPR_2024-03-21 13:40:43.798475.pkl',
+        '/share/rk1/home/marta/obfuscation/all_test_mean_stereo/ml-1m/test_MultiVAE_2024-03-21 13:45:47.175976.pkl',
+        '/share/rk1/home/marta/obfuscation/all_test_mean_stereo/ml-1m/test_LightGCN_2024-03-21 11:31:56.046160.pkl'
+        
+    ],
+    "PERBLURNEW_ALL":[
+ '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo//lfm-100k/test_LightGCN_2024-03-22 04:06:45.181019.pkl',
+ '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo//lfm-100k/test_LightGCN_2024-03-22 05:14:27.110829.pkl',
+ '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/lfm-100k/test_MultiVAE_2024-03-21 23:46:54.495709.pkl',
+ '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/lfm-100k/test_BPR_2024-03-22 00:09:58.806306.pkl',
+ '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/ml-1m/test_MultiVAE_2024-03-21 22:12:02.608924.pkl',
+ '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/ml-1m/test_MultiVAE_2024-03-21 22:00:13.799104.pkl',
+ '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/ml-1m/test_BPR_2024-03-21 22:51:26.872383.pkl',
+ '/share/rk4/home/gustavoe/obfuscation/all_test_mean_stereo/ml-1m/test_LightGCN_2024-03-22 00:19:04.035501.pkl'
+ 
+]
 }
 results_files = []
 [[results_files.append(x) for x in row] for row in list(results_files_split.values())]
@@ -94,6 +121,8 @@ def convert_table(file):
     df = pd.DataFrame.from_dict(file)
     print(df.columns)
     print(df.head())
+    
+    
     df["dataset"] = df["name"].apply(lambda x: "-".join(x.split("-")[1:]))
     converted_df = df.groupby(["Model", "dataset"])[
         [x for x in df.columns if x.endswith("20")]

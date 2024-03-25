@@ -8,10 +8,16 @@ from tqdm import tqdm
 #%%
 
 dataset_name = "ml-1m"
-obf_ratio = 0.05 # 0.1
-kth = 200 #500 for lfm
+obf_ratio = 0.1
+kth = 200 #500 #for lfm
 N_NEIGBORS = 50 #100 for lfm
-obf_dataset_name = f"{dataset_name}_perblurstd_{obf_ratio}_perblur_perblur_perblur"
+
+imputate = True
+remove=False
+if imputate:
+  obf_dataset_name = f"{dataset_name}_imputate_{obf_ratio}_perblur_perblur_perblur"
+if remove:
+  obf_dataset_name = f"{dataset_name}_remove_{obf_ratio}_perblur_perblur_perblur"
 out_dataset_dir = f"{ROOT_DIR_STR}/obf_baseline"
 import os
 if not os.path.exists(f"{out_dataset_dir}/{obf_dataset_name}"):
@@ -108,23 +114,44 @@ user_ranks_sums = np.asarray(np.sum(X, axis=1)).flatten()
 user_ranks_max_10 = np.asarray(np.floor(0.1*np.sum(X, axis=1))).flatten()
 user_ranks_max_5 = np.asarray(np.floor(0.05*np.sum(X, axis=1))).flatten()
 #%%
-
-obf_matrix=X.copy()
-gender=user_data["gender"].values
-user_ranks_max = user_ranks_max_10 if obf_ratio==0.1 else user_ranks_max_5
-topk=50   
-for user_row in X:
-   q=0
-   u_gender = gender[user]
-   L_indicative = L_m if u_gender == "F" else L_m 
-   L_indicative= L_indicative[:topk]
-   inter=np.intersect1d(userlist[user],L_indicative)
-   limit_num_obf=user_ranks_max[user]
-   if len(inter>0) and limit_num_obf>0: 
-    if len(inter)<limit_num_obf:
-      obf_matrix[user,inter]=1
-    else:
-      obf_matrix[user,inter[:limit_num_obf]]=1
+# imputate
+if imputate:
+  obf_matrix=X.copy()
+  gender=user_data["gender"].values
+  user_ranks_max = user_ranks_max_10 if obf_ratio==0.1 else user_ranks_max_5
+  topk=50   
+  for user,user_row in enumerate(X):
+    q=0
+    u_gender = gender[user]
+    L_indicative = L_m if u_gender == "F" else L_m 
+    L_indicative= L_indicative[:topk]
+    inter=np.intersect1d(userlist[user],L_indicative)
+    limit_num_obf=int(user_ranks_max[user])
+    if len(inter>0) and limit_num_obf>0: 
+      if len(inter)<limit_num_obf:
+        obf_matrix[user,inter]=1
+      else:
+        obf_matrix[user,inter[:limit_num_obf]]=1
+#%%
+# removal
+if remove:
+  obf_matrix=X.copy()
+  gender=user_data["gender"].values
+  user_ranks_max = user_ranks_max_10 if obf_ratio==0.1 else user_ranks_max_5
+  topk=50   
+  for user,user_row in enumerate(X):
+    q=0
+    u_gender = gender[user]
+    L_indicative = L_f if u_gender == "F" else L_m 
+    L_indicative= L_indicative[:topk]
+    
+    inter=np.intersect1d(user_row.nonzero()[1],L_indicative)
+    limit_num_obf=int(user_ranks_max[user])
+    if len(inter>0) and limit_num_obf>0: 
+      if len(inter)<limit_num_obf:
+        obf_matrix[user,inter]=0
+      else:
+        obf_matrix[user,inter[:limit_num_obf]]=0      
 #%%
 item_mapping=token2item#pd.read_csv(f"{ROOT_DIR_STR}/obfuscation/ml-1m/item_mapping.csv")
 user_mapping=token2user#pd.read_csv(f"{ROOT_DIR_STR}/obfuscation/ml-1m/user_mapping.csv")
