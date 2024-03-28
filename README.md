@@ -1,6 +1,7 @@
 # Obfuscation based on stereotypicality
 
 <!--
+
 Otras son las cosas que transforman aquel vertigo entre sus dos miradas
 muchas veces volveras a ser mi quinto silencio 
 se que has de caminar
@@ -12,4 +13,5 @@ Many times you will be my fifth silence again
 I am certain you have to fly away
 You will be back to that circle we had created
 With that inconsistence, we will one more time mirror each other 
+ 
  -->
