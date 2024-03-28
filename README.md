@@ -15,3 +15,5 @@ You will be back to that circle we had created
 With that inconsistence, we will one more time mirror each other 
  
  -->
+
+> python pool_recs.py --model LightGCN --dataset lfm-100k --data_path <data_path> --out_dir <out_dir> --datasets_file <datasets_file.json> --nproc 1 --gpu 1'
