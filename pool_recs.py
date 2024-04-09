@@ -14,14 +14,79 @@ from pathlib import Path
 import json
 config_base = {}
 datasets  = [
-        '',
-        #'_remove_0.05_ff_median_th0.005', 
-        #'_remove_0.1_ff_median_th0.005', 
-        #'_remove_0.15_ff_median_th0.005',
-        
-        '_remove_0.05_ff_mean_th0.005', 
-        #'_remove_0.1_ff_mean_th0.005', 
-        #'_remove_0.15_ff_mean_th0.005', 
+        "",
+        "_imputate_0.05_ff_diff_th0.3",
+        "_imputate_0.05_ff_mean-abs_th0.3",
+        "_imputate_0.05_ff_median-abs_th0.3",
+        "_imputate_0.05_ff_median_th0.3",
+        "_imputate_0.05_random_diff_th0.3",
+        "_imputate_0.05_random_mean-abs_th0.3",
+        "_imputate_0.05_random_median-abs_th0.3",
+        "_imputate_0.05_random_median_th0.3",
+        "_imputate_0.05_topk_diff_th0.3",
+        "_imputate_0.05_topk_mean-abs_th0.3",
+        "_imputate_0.05_topk_median-abs_th0.3",
+        "_imputate_0.05_topk_median_th0.3",
+        "_imputate_0.1_ff_diff_th0.3",
+        "_imputate_0.1_ff_mean-abs_th0.3",
+        "_imputate_0.1_ff_median-abs_th0.3",
+        "_imputate_0.1_ff_median_th0.3",
+        "_imputate_0.1_random_diff_th0.3",
+        "_imputate_0.1_random_mean-abs_th0.3",
+        "_imputate_0.1_random_median-abs_th0.3",
+        "_imputate_0.1_random_median_th0.3",
+        "_imputate_0.1_topk_diff_th0.3",
+        "_imputate_0.1_topk_mean-abs_th0.3",
+        "_imputate_0.1_topk_median-abs_th0.3",
+        "_imputate_0.1_topk_median_th0.3",
+        "_remove_0.05_ff_diff_th0.3",
+        "_remove_0.05_ff_mean-abs_th0.3",
+        "_remove_0.05_ff_median-abs_th0.3",
+        "_remove_0.05_ff_median_th0.3",
+        "_remove_0.05_random_diff_th0.3",
+        "_remove_0.05_random_mean-abs_th0.3",
+        "_remove_0.05_random_median-abs_th0.3",
+        "_remove_0.05_random_median_th0.3",
+        "_remove_0.05_topk_diff_th0.3",
+        "_remove_0.05_topk_mean-abs_th0.3",
+        "_remove_0.05_topk_median-abs_th0.3",
+        "_remove_0.05_topk_median_th0.3",
+        "_remove_0.1_ff_diff_th0.3",
+        "_remove_0.1_ff_mean-abs_th0.3",
+        "_remove_0.1_ff_median-abs_th0.3",
+        "_remove_0.1_ff_median_th0.3",
+        "_remove_0.1_random_diff_th0.3",
+        "_remove_0.1_random_mean-abs_th0.3",
+        "_remove_0.1_random_median-abs_th0.3",
+        "_remove_0.1_random_median_th0.3",
+        "_remove_0.1_topk_diff_th0.3",
+        "_remove_0.1_topk_mean-abs_th0.3",
+        "_remove_0.1_topk_median-abs_th0.3",
+        "_remove_0.1_topk_median_th0.3",
+        "_weighted_0.05_ff_diff_th0.3",
+        "_weighted_0.05_ff_mean-abs_th0.3",
+        "_weighted_0.05_ff_median-abs_th0.3",
+        "_weighted_0.05_ff_median_th0.3",
+        "_weighted_0.05_random_diff_th0.3",
+        "_weighted_0.05_random_mean-abs_th0.3",
+        "_weighted_0.05_random_median-abs_th0.3",
+        "_weighted_0.05_random_median_th0.3",
+        "_weighted_0.05_topk_diff_th0.3",
+        "_weighted_0.05_topk_mean-abs_th0.3",
+        "_weighted_0.05_topk_median-abs_th0.3",
+        "_weighted_0.05_topk_median_th0.3",
+        "_weighted_0.1_ff_diff_th0.3",
+        "_weighted_0.1_ff_mean-abs_th0.3",
+        "_weighted_0.1_ff_median-abs_th0.3",
+        "_weighted_0.1_ff_median_th0.3",
+        "_weighted_0.1_random_diff_th0.3",
+        "_weighted_0.1_random_mean-abs_th0.3",
+        "_weighted_0.1_random_median-abs_th0.3",
+        "_weighted_0.1_random_median_th0.3",
+        "_weighted_0.1_topk_diff_th0.3",
+        "_weighted_0.1_topk_mean-abs_th0.3",
+        "_weighted_0.1_topk_median-abs_th0.3",
+        "_weighted_0.1_topk_median_th0.3"
 ]
         
         
@@ -40,7 +105,7 @@ parameter_dict = {
     "save_dataset": True,
     "save_dataloaders": True,
     "embedding_size": 64,
-    "epochs": 2, 
+    "epochs": 100, 
     "train_batch_size": 512,
     "eval_batch_size": 2048, 
     "benchmark_filename": ['train','valid','test'] ,
@@ -56,7 +121,7 @@ parameter_dict = {
     #},
     "use_gpu":True,
     #"device": torch.device('cpu')
-    #"nproc":8,
+    "nproc":1,
     #"gpu_id": '1,2,3',
     "log_wandb": False     
 }
@@ -109,6 +174,7 @@ if __name__ == "__main__":
     parser.add_argument('--out_dir',required=False)
     parser.add_argument('--gpu',type=int,required=False)
     parser.add_argument('--dataset',type=str,required=False)
+    parser.add_argument('--datasets_file',type=str,required=False,default="NoFile")
     parser.add_argument('--wandb',action="store_true")
 
     parser.add_argument("--valid_latex", type=str, default="./latex/valid.tex", help="config files"
@@ -144,6 +210,10 @@ if __name__ == "__main__":
     datasets =[f"{dataset_name}{folder}" for folder in datasets]
     parameter_dict["data_path"] = args.data_path
     out_dir = args.out_dir+"/"#+get_local_time()+"/"
+    
+    if args.datasets_file != "NoFile":
+        with open(args.datasets_file,"rb") as dt_:
+            datasets = json.load(dt_)["datasets"]
 
     parameter_dict["out_dir"] = out_dir
     if  not os.path.exists(out_dir):

@@ -87,7 +87,34 @@ def transform_to_obf(data):
         }
     data.rename(columns=recbole_map,inplace=True )
     return data
+
+def transform_dataframe_to_sparse(interactions):
+    unique_items = interactions["itemID"].unique()
+    print(f"n_items: {len(unique_items)}")
+    item2token = pd.Series(unique_items)
+    token2item = pd.Series(data=item2token.index, index=item2token.values)
     
+    unique_users = interactions["userID"].unique()
+    user2token = pd.Series(unique_users)
+    token2user = pd.Series(data=user2token.index, index=user2token.values)
+    
+    
+    #print(interactions.head())
+    # assigning unique ids 
+    interactions.loc[:,"userID"] = token2user.loc[interactions.loc[:,"userID"]].values
+    interactions.loc[:,"itemID"] = token2item.loc[interactions.loc[:,"itemID"]].values
+    
+    user_info = interactions.drop_duplicates(["userID"])
+
+    uids_iids_array = interactions[["userID","itemID"]].values
+    n_users,n_items = interactions.userID.nunique(),len(unique_items) 
+    data = np.ones(uids_iids_array.shape[0],dtype=np.int8)
+
+    uids,iids = uids_iids_array[:,0],uids_iids_array[:,1]
+    interaction_matrix = sp.csr_matrix((data, (uids, iids)), 
+                                        (n_users, n_items))  
+    return interaction_matrix,user_info,token2item,token2user
+ 
 def save_csr_matrix(data_dir, interactions):
 
     unique_items = interactions["itemID"].unique()

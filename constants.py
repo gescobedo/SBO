@@ -1,5 +1,6 @@
 from pathlib import Path
 
+RAND_SEED = 42
 ROOT_DIR_STR = "/media/gustavo/Storage/Datasets"
 ROOT_DIR = Path(ROOT_DIR_STR)
 
@@ -17,11 +18,16 @@ SAMPLE_METHODS=[
     ]
 STEREO_TYPES = [
     #"mean", 
-    "median",
+    #"median",
     "mean-abs", 
     "median-abs",
-    "diff",
+    #"diff",
     ]
 USER_STEREO_THRES= [0.5, 0.25, 0.1, 0.005, 0.0025]
+USER_STEREO_THRES_DICT= {
+    "ml-1m":0.30, 
+    "lfm-100k":0.39,
+    "ml-1m-1000":0.30, 
+    "lfm-100k-1000":0.39}
 P_SAMPLE = [0.05, 0.10] #,0.15]
 TOPK=[50, 100]
