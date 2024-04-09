@@ -11,7 +11,13 @@ from constants import *
 from obfuscation import *
 
 #%%
-
+def generate_item_ster_vectors(dataset_name,root_data = ROOT_DIR_STR):
+    item_mapping = pd.read_csv(Path( root_data)/dataset_name/"item_mapping.csv",names=["itemID","token"],skiprows=1)
+    item_ster= pd.read_csv(Path(root_data)/dataset_name/f"{dataset_name}_gender_incl.csv",index_col="itemID")
+    merged=item_mapping.merge(item_ster,on="itemID",how="left").fillna(0).sort_values("token")
+    item_ster_values = np.array(merged["FF"].values).reshape(1,-1)
+    np.save(Path(root_data)/dataset_name/"item_ster_values.npy", item_ster_values)
+    return item_ster_values
 
 def generate_genre_inclination(data,out_dir,name):
     user_groups = {"gender":["M","F"]}
