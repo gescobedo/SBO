@@ -1,11 +1,8 @@
-import numpy as np
-import pandas as pd
-import os
-from pathlib import Path
-import seaborn as sns
-from pd_utils import filter_by
 import matplotlib.pyplot as plt
+import seaborn as sns
+
 from obfuscation import *
+
 
 def plot_user_score(data_inter,data_user,ff_data,title, method):
     joined = data_inter.join(data_user[["userID","gender"]], on="userID",how="left", lsuffix='', rsuffix='r').dropna()

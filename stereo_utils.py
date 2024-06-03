@@ -1,16 +1,6 @@
 import numpy as np
 import pandas as pd
-import os
-from pathlib import Path
-import seaborn as sns
-from pd_utils import filter_by
-import matplotlib.pyplot as plt
 from constants import *
-
-
-def do_something_with_the_group_data(data):
-
-    return ""
 
 
 def item_relative_freq(data):
@@ -74,20 +64,20 @@ def calc_user_stereotyp_pref(ff_values, method="mean"):
     user_stereo = -1.05
     if len(ff_values > 0):
         if method == "mean":
-            user_stereo = np.mean(ff_values) #[-1:1]
+            user_stereo = np.mean(ff_values)  # [-1:1]
         elif method == "median":
-            user_stereo = np.median(ff_values) #[-1:1]
+            user_stereo = np.median(ff_values)  # [-1:1]
         elif method == "mean-abs":
-            user_stereo = np.mean(np.abs(ff_values)) #[0:1]
+            user_stereo = np.mean(np.abs(ff_values))  # [0:1]
         elif method == "median-abs":
-            user_stereo = np.median(np.abs(ff_values)) #[0:1]
+            user_stereo = np.median(np.abs(ff_values))  # [0:1]
         elif method == "mean-pos":
-            user_stereo = np.mean(np.where(ff_values >= 0)) #[0:1]
+            user_stereo = np.mean(np.where(ff_values >= 0))  # [0:1]
         elif method == "median-pos":
-            user_stereo = np.median(np.where(ff_values >= 0)) #[0:1]    
-        elif method == "diff": 
-            #[0:1]
-            user_stereo = (  
+            user_stereo = np.median(np.where(ff_values >= 0))  # [0:1]
+        elif method == "diff":
+            # [0:1]
+            user_stereo = (
                 np.sum(np.where(ff_values >= 0))
                 - np.sum(np.abs(np.where(ff_values < 0))) / 2
             )
@@ -131,22 +121,27 @@ def calc_all_user_stereotyp_pref(user_dataset, ff_data, sterotyp_methods=STEREO_
         scores.append(ster_scores)
     return pd.concat(scores, axis=1)
 
+
 def calc_user_stereotyp_category_weights(ff_values):
     return np.sum(np.where(ff_values >= 0)), np.sum(np.abs(np.where(ff_values < 0)))
 
+
 def calculate_dataset_pref_by_category(user_dataset, ff_data, sterotyp_method):
     unique_users = user_dataset["userID"].unique()
-    
+
     data = []
     for user in unique_users:
         user_data = user_dataset.loc[user_dataset["userID"] == user]
         # Selecting only items that have defined FF values from the user profile
-        user_ff_data = ff_data.loc[np.intersect1d(user_data["itemID"].unique(),ff_data.index.values)] 
+        user_ff_data = ff_data.loc[
+            np.intersect1d(user_data["itemID"].unique(), ff_data.index.values)
+        ]
         pos_ster, neg_ster = calc_user_stereotyp_category_weights(user_ff_data)
         data.append([user, pos_ster, neg_ster])
 
-    user_ster = pd.DataFrame(data=np.zeros(len(unique_users),3), columns=["userID","pos_ster","neg_ster"])
-    user_ster.set_index("userID",inplace=True)
+    user_ster = pd.DataFrame(
+        data=np.zeros(len(unique_users), 3), columns=["userID", "pos_ster", "neg_ster"]
+    )
+    user_ster.set_index("userID", inplace=True)
 
     return user_ster
-  
