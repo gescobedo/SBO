@@ -1,4 +1,4 @@
-name: recbole-bert
+name: sbo
 channels:
   - defaults
 dependencies:
@@ -65,7 +65,6 @@ dependencies:
       - ray==2.6.3
       - referencing==0.33.0
       - requests==2.31.0
-      - rmet-tigxy==0.0.1
       - rpds-py==0.18.0
       - scikit-learn==1.4.1.post1
       - scipy==1.10.1
@@ -73,7 +72,6 @@ dependencies:
       - setproctitle==1.3.3
       - six==1.16.0
       - smmap==5.0.1
-      - strenum==0.4.15
       - tabulate==0.9.0
       - tbparser==0.1.1
       - tenacity==8.2.3
@@ -91,4 +89,4 @@ dependencies:
       - urllib3==2.2.1
       - wandb==0.16.3
       - werkzeug==3.0.1
-prefix: /home/gustavoe/miniconda3/envs/recbole-bert
+prefix: /home/user/miniconda3/envs/sbo
