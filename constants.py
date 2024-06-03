@@ -1,7 +1,7 @@
 from pathlib import Path
 
 RAND_SEED = 42
-ROOT_DIR_STR = "/media/gustavo/Storage/Datasets"
+ROOT_DIR_STR = "../Datasets" # Replace this line to path_to_datasets/Datasets 
 ROOT_DIR = Path(ROOT_DIR_STR)
 
 K_CORE = 5
