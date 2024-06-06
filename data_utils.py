@@ -3,8 +3,6 @@ import numpy as np
 import pandas as pd
 import os
 from pathlib import Path
-import seaborn as sns
-import matplotlib.pyplot as plt
 from scipy import sparse as sp
 
 def split_by_inter_ratio(data, ratio=0.8, random_state=42,user_key="userID"

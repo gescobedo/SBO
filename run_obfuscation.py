@@ -1,7 +1,7 @@
 from obfuscation import run_obfuscation
 from constants import *
 from joblib import Parallel, delayed
-from tqdm import tqdm, trange
+from tqdm import tqdm
 import numpy as np
 
 datasets_source = {

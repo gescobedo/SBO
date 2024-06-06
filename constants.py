@@ -12,9 +12,9 @@ OBF_METHODS=[
     "weighted",
     ]
 SAMPLE_METHODS=[
-    "ff",
-    "random",
-    "topk"
+    "ff",   # Stereotypicality-based Sampling
+    "random", # Random sampling
+    "topk"  # Top-k Stereotypicality-based Sampling
     ]
 STEREO_TYPES = [
     #"mean", 
@@ -29,5 +29,5 @@ USER_STEREO_THRES_DICT= {
     "lfm-100k":0.39,
     "ml-1m-1000":0.30, 
     "lfm-100k-1000":0.39}
-P_SAMPLE = [0.05, 0.10] #,0.15]
-TOPK=[50, 100]
+P_SAMPLE = [0.05, 0.10] #,0.15] # obfuscation ratio
+TOPK=[50, 100] 

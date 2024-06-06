@@ -1,20 +1,14 @@
-import numpy as np
-import pandas as pd
 from datetime import datetime
 import pickle
 import os
 import argparse
-from tqdm import tqdm
 from recbole.quick_start import run_recbole
 from joblib import delayed, Parallel
 from pathlib import Path
 import json
 
-config_base = {}
 datasets = []
 
-
-models = ["BPR", "LightGCN", "MultiVAE"]
 num_cores = 6
 
 parameter_dict = {

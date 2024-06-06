@@ -1,14 +1,8 @@
 # %%
 import numpy as np
 import pandas as pd
-import pickle
 import os
 import argparse
-from tqdm import tqdm
-from pathlib import Path
-import seaborn as sns
-from pd_utils import filter_by
-import matplotlib.pyplot as plt
 from data_utils import *
 import json
 from constants import *
@@ -302,6 +296,7 @@ def run_obfuscation(
         sub_method=sample_method,
         sterotyp_method=stereo_type,
         user_stereo_pref_thresh=user_stereo_pref_thresh,
+        weights=weights
     )
     print(f"Saving file in:\n{out_file}")
 
