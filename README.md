@@ -43,7 +43,7 @@ sh run_train_attack.sh <DATASET_CONFIG> <DATASETS_FILES>
 # sh run_train_attack.sh ml-1m ../datasets_files/datasets_sample.json 
 ```
 - To train the RecBole models on the obfuscated datasets run/adapt the script `scripts\run_recbole.sh`.
-The script executes `pool_recs.py` code which is meant to run multiple jobs. Several `csv` files will be generated containing test results of the trained models. Additionally, given that our datasets are RecBole ready, individual model can be trained following the [documentation](https://recbole.io/docs/get_started/started/general.html)
+The script executes `pool_recs.py` code which is meant to run multiple jobs. Several `csv` files will be generated containing test results of the trained models. Additionally, given that our datasets are RecBole ready, individual models can be trained following the [documentation](https://recbole.io/docs/get_started/started/general.html)
 ```bash
 cd scripts
 sh run_recbole.sh <DATASETS_FILES> <RECOMMENDER_MODEL> 
