@@ -7,8 +7,10 @@ from joblib import delayed, Parallel
 from pathlib import Path
 import json
 from constants import *
+import pandas as pd
+from collections import defaultdict
 
-datasets = os.listdir(ROOT_DIR_STR)
+
 
 num_cores = 6
 
@@ -67,6 +69,61 @@ def run_alg(args, model, dataset, config):
 
     return results
 
+def convert_table(file):
+    for res in file:
+        res.update(res["test_result"])
+
+    df = pd.DataFrame.from_dict(file)
+    print(df.columns)
+    print(df.head())
+    
+    
+    df["dataset"] = df["name"].apply(lambda x: "-".join(x.split("-")[1:]))
+    converted_df = df.groupby(["Model", "dataset"])[
+        [x for x in df.columns if x.endswith("20")]
+    ].mean()
+    std_df = df.groupby(["Model", "dataset"])[
+        [x for x in df.columns if x.endswith("20")]
+    ].std()
+    return df, converted_df, std_df
+
+
+def read_rebole_result_files(results_files):
+    results_dict = defaultdict(lambda: [])
+    for file_name in results_files:
+        data = pickle.load(open(file_name, "rb"))
+        key = file_name.split("/")[0]
+        for data_item in data:
+            results_dict[key].append(data_item)
+    return results_dict
+
+def transform_recbole_results(data,key):
+    results_dict = defaultdict(lambda: [])
+    for data_item in data:
+        results_dict[key].append(data_item)
+    return results_dict
+
+def process_results(recbole_results,key):
+    processed_results_dict = {}
+    dfs = []
+    results_dict = transform_recbole_results(recbole_results,key)
+    for key, data in results_dict.items():
+        df, conv_df, std = convert_table(data)
+        df["key"] = key
+        processed_results_dict[key] = conv_df
+        print(key)
+        print(processed_results_dict[key])
+        # print(std)
+        dfs.append(df)
+    joined = pd.concat(dfs, axis=0, ignore_index=True)
+    print(joined.head())
+    return joined
+
+
+def process_results_split(results_split, dir):
+    for k, results_files in results_split.items():
+        joined = process_results(results_files)
+        joined.to_csv(f"{dir}/result_{k}.csv", index=False)
 
 if __name__ == "__main__":
 
@@ -111,7 +168,7 @@ if __name__ == "__main__":
     model = args.model
     models = args.model.split(",")
     dataset_name = args.dataset
-    datasets = [f"{dataset_name}{folder}" for folder in datasets]
+    datasets = os.listdir(args.data_path)
     parameter_dict["data_path"] = args.data_path
     out_dir = args.out_dir + "/"  # +get_local_time()+"/"
 
@@ -158,27 +215,5 @@ if __name__ == "__main__":
 
     print(f"Saving results to {out_dir}")
 
-    if not os.path.exists("/".join([out_dir, dataset_name])):
-        os.makedirs("/".join([out_dir, dataset_name]))
-    datasets_dict = {"datasets": datasets}
-    with open(f"{out_dir}/{dataset_name}/datasets.json", "w") as fh:
-        json.dump(datasets_dict, fh, indent=4)
-
-    pickle.dump(
-        valid_result_list,
-        open(
-            Path(out_dir)
-            / dataset_name
-            / f"valid_{args.model}_{str(datetime.now())}.pkl",
-            "wb",
-        ),
-    )
-    pickle.dump(
-        test_result_list,
-        open(
-            Path(out_dir)
-            / dataset_name
-            / f"test_{args.model}_{str(datetime.now())}.pkl",
-            "wb",
-        ),
-    )
+    joined = process_results(test_result_list, model)
+    joined.to_csv(f"{out_dir}/result_{model}.csv", index=False)
