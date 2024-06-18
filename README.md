@@ -51,6 +51,6 @@ sh run_recbole.sh <DATASETS_FILES> <RECOMMENDER_MODEL>
 # Example
 # sh run_recbole.sh ../datasets_files/datasets_sample.json BPR 
 ```
-## Acknowledgment
+## Acknowledgement
 
 This research was funded in whole or in part by the FFG COMET center program, by the Austrian Science Fund (FWF): P36413, P33526, and DFH-23, and by the State of Upper Austria and the Federal Ministry of Education, Science, and Research, through grant LIT-2021-YOU-215 and LIT-2020-9-SEE-113. 
