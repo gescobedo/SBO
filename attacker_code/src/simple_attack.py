@@ -173,7 +173,13 @@ if __name__ == "__main__":
     out_dir = input_config["atk_results_dir"]
     data_path = input_config["data_path"]
     # atk_results_dir must contain a JSON file
-    datasets_file = json_load(os.path.join(out_dir,input_config["datasets_file"]))["datasets"]
+
+    if input_config["datasets_file"] == None:
+        # if not "dataset_file" provided attack all folders containing datasets "data_path"
+        datasets_file = os.listdir(data_path) 
+    else:
+        datasets_file = json_load(input_config["datasets_file"])["datasets"]
+             
     
     params = []
     for dataset in datasets_file:

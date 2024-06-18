@@ -11,7 +11,7 @@ input_options = {
         "help": "The dataset root directory."
     },
     "datasets_file": {
-        "type": str, "required": False, "default": "datasets.json", 
+        "type": str, "required": False, "default": None, 
         "help": "JSON file inside 'atk_results_dir' containing a list datasets names to be attacked  {'datasets': ['ml-1m','lfm']}"
     },
       

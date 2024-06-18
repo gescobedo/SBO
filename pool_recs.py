@@ -6,8 +6,9 @@ from recbole.quick_start import run_recbole
 from joblib import delayed, Parallel
 from pathlib import Path
 import json
+from constants import *
 
-datasets = []
+datasets = os.listdir(ROOT_DIR_STR)
 
 num_cores = 6
 

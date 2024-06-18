@@ -1,26 +1,19 @@
 # Making Alice Appear Like Bob: A Probabilistic   Preference Obfuscation Method For Implicit Feedback Recommendation Models
 
 This repository contains the source code for paper:
-> "Making Alice Appear Like Bob: A Probabilistic Preference Obfuscation Method For Implicit Feedback Recommendation Models" by Gustavo Escobedo, Marta Moscati, Peter Muellner, Simone Kopeinik, Dominik Kowald, Elisabeth Lex and Markus Schedl
-```bibtex
+> Escobedo, G., Moscati, M., Müllner, P., Kopeinik, S., Kowald, D., Lex, E., and Schedl M. Making Alice Appear Like Bob: A Probabilistic Preference Obfuscation Method For Implicit Feedback Recommendation Models, Proceedings of the European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases (ECML PKDD 2024), Vilnius, Lithuania, September 2024.
+<!-- ```bibtex
 @inproceedings{Escobedo2024SBO,
-    author = 
-        "Escobedo, Gustavo and 
-        Moscati, Marta and 
-        M\"{u}llner, Peter and 
-        Kopeinik, Simone and 
-        Dominik Kowald and 
-        Elisabeth Lex and 
-        Markus Schedl",
+    author = "Escobedo, Gustavo and Moscati, Marta and Mullner, Peter and Kopeinik, Simone and Kowald, Dominik  and Lex, Elisabeth  and Schedl, Markus",
     title = "Making Alice Appear Like Bob: A Probabilistic Preference Obfuscation Method 
             For Implicit Feedback Recommendation Models",
     booktitle = "Machine Learning and Knowledge Discovery in Databases: Research Track",
     publisher = "Springer Nature Switzerland",
     address="",
     pages="--",
-    year = 2024,
+    year = 2024
 }
-```
+``` -->
 ## Installation and configuration
 ```bash
 # Create environment
@@ -41,7 +34,14 @@ python preprocess.py
 # Generate the obfuscated dataset files
 python run_obfuscation.py
 ```
+- To train the attacker and recommender models you will need to run/adapt the script `scripts\run_train_attack.sh`.
+```bash
+cd scripts
+sh run_train_attack.sh <DATASET_CONFIG> <DATASETS_FILES> <RECOMMENDER_MODEL>
 
+# Example
+# sh run_train_attack.sh ml-1m ../datasets_files/datasets_sample.json BPR
+```
 ## Acknowledgment
 
-This research was funded in whole or in part by the FFG COMET center program, by the Austrian Science Fund (FWF): P36413, P33526, and DFH-23, and by the State of Upper Austria and the Federal Ministry of Education, Science, and Research, through grant LIT-2021-YOU-215.
+This research was funded in whole or in part by the FFG COMET center program, by the Austrian Science Fund (FWF): P36413, P33526, and DFH-23, and by the State of Upper Austria and the Federal Ministry of Education, Science, and Research, through grant LIT-2021-YOU-215 and LIT-2020-9-SEE-113.
